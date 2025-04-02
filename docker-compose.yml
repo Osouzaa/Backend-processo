@@ -1,0 +1,17 @@
+version: '3.8' # Define a versão do Compose
+
+services:
+  postgres:
+    image: postgres
+    container_name: backendTeste
+    environment:
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: docker
+      POSTGRES_DB: test
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+volumes:
+  postgres_data:
