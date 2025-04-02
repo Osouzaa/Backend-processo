@@ -1,4 +1,4 @@
-import { IsNotEmpty, IsOptional, IsBoolean, IsString, IsDate } from 'class-validator';
+import { IsNotEmpty, IsOptional, IsBoolean, IsString } from 'class-validator';
 
 export class CreateInscricaoEducacaoDto {
   @IsNotEmpty()
@@ -6,8 +6,8 @@ export class CreateInscricaoEducacaoDto {
   nomeCompleto: string;
 
   @IsNotEmpty()
-  @IsDate()
-  dataNascimento: Date;
+  @IsString()
+  dataNascimento: string;
 
   @IsNotEmpty()
   @IsString()
@@ -41,8 +41,8 @@ export class CreateInscricaoEducacaoDto {
   @IsString()
   contato: string;
 
-  @IsBoolean()
-  pcd: boolean;
+  @IsString()
+  pcd: string;
 
   @IsOptional()
   @IsString()
@@ -53,21 +53,43 @@ export class CreateInscricaoEducacaoDto {
   cargoFuncao: string;
 
   // 📚 Escolaridade
+  @IsBoolean()
+  @IsOptional()
+  possuiEnsinoFundamental: boolean;
+
   @IsOptional()
   @IsString()
   ensinoFundamental?: string;
+
+  @IsBoolean()
+  @IsOptional()
+  possuiEnsinoMedio: boolean;
 
   @IsOptional()
   @IsString()
   ensinoMedio?: string;
 
+  @IsBoolean()
+  @IsOptional()
+  possuiEnsinoSuperior: boolean;
+
   @IsOptional()
   @IsString()
   ensinoSuperior?: string;
 
+
+  @IsBoolean()
+  @IsOptional()
+  possuiCursoAreaEducacao: boolean;
+
   @IsOptional()
   @IsString()
-  cursoEducacao?: string;
+  cursoAreaEducacao?: string;
+
+
+  @IsBoolean()
+  @IsOptional()
+  possuiDoutorado: boolean;
 
   @IsOptional()
   @IsString()
