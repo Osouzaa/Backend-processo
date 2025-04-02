@@ -18,31 +18,48 @@ export class InscricaoEducacaoService {
     }
 
     const novaInscricao = this.inscricaoEducacaoRepository.create(dto);
+    let pontuacao = 0; // Iniciamos a pontuação em 0
+
     if (files) {
       files.forEach((file) => {
         const fileUrl = `http://localhost:3000/uploads/${file.filename}`;
         switch (file.fieldname) {
           case 'ensinoFundamental':
             novaInscricao.ensinoFundamental = fileUrl;
+            pontuacao += 10;
             break;
           case 'ensinoMedio':
             novaInscricao.ensinoMedio = fileUrl;
+            pontuacao += 10;
             break;
           case 'ensinoSuperior':
             novaInscricao.ensinoSuperior = fileUrl;
+            pontuacao += 10;
             break;
           case 'cursoEducacao':
             novaInscricao.cursoAreaEducacao = fileUrl;
+            pontuacao += 10;
             break;
           case 'doutorado':
             novaInscricao.doutorado = fileUrl;
-            break;
-          case 'laudoPcd':
-            novaInscricao.laudoPcd = fileUrl;
+            pontuacao += 10;
             break;
         }
       });
     }
+
+    // 🎯 Calcular pontuação baseada no tempo de experiência
+    if (dto.tempoExperiencia) {
+      if (dto.tempoExperiencia >= 3) {
+        pontuacao += 30;
+      } else if (dto.tempoExperiencia >= 2) {
+        pontuacao += 20;
+      } else if (dto.tempoExperiencia >= 1) {
+        pontuacao += 10;
+      }
+    }
+
+    novaInscricao.pontuacao = pontuacao; // 🔥 Atribuindo a pontuação calculada
     return await this.inscricaoEducacaoRepository.save(novaInscricao);
   }
 
@@ -56,8 +73,9 @@ export class InscricaoEducacaoService {
     return candidate
   }
 
-  findAll() {
-    return `This action returns all inscricaoEducacao`;
+  async findAll() {
+    const candidates = await this.inscricaoEducacaoRepository.find()
+    return candidates
   }
 
   findOne(id: number) {

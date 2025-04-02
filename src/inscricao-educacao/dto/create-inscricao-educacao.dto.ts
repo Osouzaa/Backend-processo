@@ -1,4 +1,4 @@
-import { IsNotEmpty, IsOptional, IsBoolean, IsString } from 'class-validator';
+import { IsNotEmpty, IsOptional, IsBoolean, IsString, IsNumber } from 'class-validator';
 
 export class CreateInscricaoEducacaoDto {
   @IsNotEmpty()
@@ -95,12 +95,9 @@ export class CreateInscricaoEducacaoDto {
   @IsString()
   doutorado?: string;
 
-  // 🏢 Experiência Profissional
-  @IsOptional()
-  @IsString()
-  experienciaMunicipal?: string;
+
 
   @IsOptional()
-  @IsString()
-  experienciaEstadual?: string;
+  @IsNumber()
+  tempoExperiencia?: number;
 }

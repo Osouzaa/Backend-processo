@@ -21,6 +21,9 @@ export class InscricaoEducacao {
   @Column()
   nomeCompleto: string;
 
+  @Column({ nullable: true })
+  pontuacao: number
+
   @Column({ type: 'date' })
   dataNascimento: Date;
 
@@ -86,7 +89,6 @@ export class InscricaoEducacao {
   doutorado: string; // 📂 Link do anexo
 
 
-  // 🏆 Experiência profissional
   @Column({ nullable: true })
-  experienciaMunicipalEstadual: string;
+  tempoExperiencia: number
 }
