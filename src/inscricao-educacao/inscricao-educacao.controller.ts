@@ -12,14 +12,26 @@ export class InscricaoEducacaoController {
 
   @Post()
   @UseInterceptors(
-    FileFieldsInterceptor([
-      { name: 'ensinoFundamental', maxCount: 1 },
-      { name: 'ensinoMedio', maxCount: 1 },
-      { name: 'ensinoSuperior', maxCount: 1 },
-      { name: 'cursoEducacao', maxCount: 1 },
-      { name: 'doutorado', maxCount: 1 },
-      { name: 'laudoPcd', maxCount: 1 },
-    ])
+    FileFieldsInterceptor(
+      [
+        { name: 'ensinoFundamental', maxCount: 1 },
+        { name: 'ensinoMedio', maxCount: 1 },
+        { name: 'ensinoSuperior', maxCount: 1 },
+        { name: 'cursoEducacao', maxCount: 1 },
+        { name: 'doutorado', maxCount: 1 },
+        { name: 'laudoPcd', maxCount: 1 },
+      ],
+      {
+        storage: diskStorage({
+          destination: './uploads', // Diretório onde os arquivos serão armazenados
+          filename: (req, file, callback) => {
+            const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1e9);
+            const ext = extname(file.originalname);
+            callback(null, `${file.fieldname}-${uniqueSuffix}${ext}`);
+          },
+        }),
+      },
+    ),
   )
   create(
     @Body() createInscricaoEducacaoDto: CreateInscricaoEducacaoDto,
