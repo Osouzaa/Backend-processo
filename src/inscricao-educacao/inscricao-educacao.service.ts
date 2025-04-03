@@ -29,14 +29,10 @@ export class InscricaoEducacaoService {
       fs.mkdirSync(candidateDir, { recursive: true });
     }
 
-    function sanitizeFileName(filename: string): string {
-      return filename.normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/\s+/g, "_");
-    }
-
     const savedFiles: { [key: string]: string } = {};
 
     if (files.cpfFile?.length) {
-      const cpfFilePath = path.join(candidateDir, 'cpf.pdf'); // Nome fixo: cpf.pdf
+      const cpfFilePath = path.join(candidateDir, 'cpf.pdf');
       fs.writeFileSync(cpfFilePath, files.cpfFile[0].buffer);
       savedFiles['cpfFile'] = cpfFilePath;
     }
