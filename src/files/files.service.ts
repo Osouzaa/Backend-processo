@@ -18,16 +18,12 @@ export class FilesService {
   ) { }
 
   async create(dto: CreateFileDto, file: Express.Multer.File) {
-    this.logger.log(`Buscando inscrição ID: ${dto.inscricaoId}`);
 
     const inscricao = await this.inscricaoService.findOne(+dto.inscricaoId);
 
     if (!inscricao) {
-      this.logger.error(`Inscrição ${dto.inscricaoId} não encontrada!`);
       throw new Error("Inscrição não encontrada!");
     }
-
-    this.logger.log(`Inscrição encontrada: ${inscricao.nomeCompleto} (${inscricao.cpf})`);
 
     function sanitize(str: string): string {
       return str.normalize("NFD")
@@ -50,6 +46,46 @@ export class FilesService {
     fs.writeFileSync(filePath, file.buffer);
 
     const newFile = this.filesRepository.create({
+      fileName: "comprovante_ensino_medio.pdf",
+      path: filePath,
+      inscricao: inscricao,
+    });
+
+    await this.filesRepository.save(newFile);
+
+    return { message: "Arquivo salvo com sucesso!", file: newFile };
+  }
+
+  async createUploadGraduacao(dto: CreateFileDto, file: Express.Multer.File) {
+
+    const inscricao = await this.inscricaoService.findOne(+dto.inscricaoId);
+
+    if (!inscricao) {
+      throw new Error("Inscrição não encontrada!");
+    }
+
+    function sanitize(str: string): string {
+      return str.normalize("NFD")
+        .replace(/[\u0300-\u036f]/g, "")
+        .replace(/\s+/g, "_")
+        .replace(/[^\w\s]/gi, "");
+    }
+
+    const nomeSanitizado = sanitize(inscricao.nomeCompleto);
+    const cpfSanitizado = inscricao.cpf.replace(/\D/g, "");
+
+    const userDir = path.join(__dirname, '../../uploads', `${nomeSanitizado}_${cpfSanitizado}`);
+
+    if (!fs.existsSync(userDir)) {
+      fs.mkdirSync(userDir, { recursive: true });
+    }
+
+    const filePath = path.join(userDir, 'Comprovante Graduação.pdf');
+
+    fs.writeFileSync(filePath, file.buffer);
+
+    const newFile = this.filesRepository.create({
+      fileName: "comprovante_ensino_medio.pdf",
       path: filePath,
       inscricao: inscricao,
     });

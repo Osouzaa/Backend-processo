@@ -9,6 +9,9 @@ export class File {
   @Column()
   path: string;
 
+  @Column()
+  fileName: string;
+
   @CreateDateColumn()
   createdAt: Date;
 

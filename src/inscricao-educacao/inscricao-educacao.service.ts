@@ -23,7 +23,6 @@ export class InscricaoEducacaoService {
       throw new ConflictException('Candidato já cadastrado!');
     }
 
-    // Diretório com Nome + CPF
     const candidateDir = path.join(__dirname, '../../uploads', `${dto.nomeCompleto.replace(/\s+/g, '_')}_${dto.cpf}`);
 
     if (!fs.existsSync(candidateDir)) {
@@ -44,7 +43,6 @@ export class InscricaoEducacaoService {
       savedFiles['comprovanteEndereco'] = addressFilePath;
     }
 
-    // Criar inscrição com os caminhos dos arquivos salvos
     const novaInscricao = this.inscricaoEducacaoRepository.create({
       ...dto,
       cpfLink: savedFiles['cpfFile'],
@@ -66,7 +64,7 @@ export class InscricaoEducacaoService {
   }
 
   async findOne(id: number) {
-    const inscricao = await this.inscricaoEducacaoRepository.findOne({ where: { id } });
+    const inscricao = await this.inscricaoEducacaoRepository.findOne({ where: { id }, relations: ['files'] });
 
     if (!inscricao) {
       throw new Error('Inscrição não encontrada');

@@ -16,4 +16,14 @@ export class FilesController {
     console.log(file, createFileDTO);
     return this.fileService.create(createFileDTO, file);
   }
+
+  @Post('graduacao')
+  @UseInterceptors(FileInterceptor('graduacao'))
+  uploadGraducao(
+    @UploadedFile() file: Express.Multer.File,
+    @Body() createFileDTO: CreateFileDto
+  ) {
+    console.log(file, createFileDTO);
+    return this.fileService.createUploadGraduacao(createFileDTO, file);
+  }
 }
