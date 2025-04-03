@@ -52,6 +52,36 @@ export class CreateInscricaoEducacaoDto {
   @IsString()
   cargoFuncao: string;
 
+  // Endereço
+
+  @IsString()
+  cep: string;
+
+  @IsString()
+  @IsNotEmpty()
+  logradouro: string;
+
+  @IsString()
+  @IsOptional()
+  complemento: string;
+
+  @IsString()
+  @IsNotEmpty()
+  numero: string;
+
+  @IsString()
+  @IsNotEmpty()
+  bairro: string;
+
+  @IsString()
+  @IsNotEmpty()
+  cidade: string;
+
+  @IsString()
+  @IsNotEmpty()
+  estado: string;
+
+
   // 📚 Escolaridade
   @IsBoolean()
   possuiEnsinoFundamental: boolean;

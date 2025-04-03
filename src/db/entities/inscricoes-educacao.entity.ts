@@ -35,6 +35,9 @@ export class InscricaoEducacao {
   cpf: string;
 
   @Column()
+  cpfLink: string;
+
+  @Column()
   genero: string;
 
   @Column({ nullable: true })
@@ -60,6 +63,34 @@ export class InscricaoEducacao {
 
   @Column()
   cargoFuncao: string;
+
+  // Endereço
+
+  @Column({ nullable: true })
+  telefone: string;
+
+  @Column()
+  cep: string;
+
+  @Column()
+  logradouro: string;
+
+  @Column()
+  complemento: string;
+
+  @Column()
+  numero: string;
+
+  @Column()
+  bairro: string;
+
+  @Column()
+  cidade: string;
+
+  @Column()
+  estado: string;
+
+  ////
 
   @Column({ default: false, nullable: true })
   possuiEnsinoFundamental: boolean;

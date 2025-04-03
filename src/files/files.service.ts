@@ -10,8 +10,11 @@ export class FilesService {
     private filesRepository: Repository<File>,
   ) { }
 
-  async saveFile(filename: string, path: string, inscricao: any) {
-    const file = this.filesRepository.create({ filename, path, inscricao });
-    return await this.filesRepository.save(file);
+  async create(fileName: string) {
+    const tempfile = this.filesRepository.create({ fileName });
+
+    const file = await this.filesRepository.save(tempfile);
+
+    return file;
   }
 }

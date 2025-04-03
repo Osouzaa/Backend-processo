@@ -11,7 +11,7 @@ export class InscricaoEducacaoService {
     @InjectRepository(InscricaoEducacao)
     private inscricaoEducacaoRepository: Repository<InscricaoEducacao>,
   ) { }
-  async create(dto: CreateInscricaoEducacaoDto) {
+  async create(dto: CreateInscricaoEducacaoDto, files: { cpf?: Express.Multer.File[], comprovanteEndereco?: Express.Multer.File[] }) {
     const candidate = await this.findByCpf(dto.cpf);
     if (candidate) {
       throw new ConflictException('Candidato já cadastrado!');
