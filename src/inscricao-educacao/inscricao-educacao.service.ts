@@ -71,8 +71,18 @@ export class InscricaoEducacaoService {
     return candidates
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} inscricaoEducacao`;
+  async findOne(id: number) {
+    const inscricao = await this.inscricaoEducacaoRepository.findOne({
+      where: {
+        id
+      }
+    })
+
+    if (!inscricao) {
+      throw new Error('Inscricao not found')
+    }
+
+    return inscricao
   }
 
   update(id: number, updateInscricaoEducacaoDto: UpdateInscricaoEducacaoDto) {

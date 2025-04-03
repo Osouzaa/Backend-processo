@@ -8,5 +8,6 @@ import { FilesModule } from 'src/files/files.module';
   imports: [TypeOrmModule.forFeature([InscricaoEducacao]), FilesModule],
   controllers: [InscricaoEducacaoController],
   providers: [InscricaoEducacaoService],
+  exports: [InscricaoEducacaoService]
 })
 export class InscricaoEducacaoModule { }
