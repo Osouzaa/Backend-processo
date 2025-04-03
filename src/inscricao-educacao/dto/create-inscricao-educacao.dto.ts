@@ -9,7 +9,7 @@ export class CreateInscricaoEducacaoDto {
   @IsString()
   dataNascimento: string;
 
-  @IsNotEmpty()
+  @IsOptional()
   @IsString()
   rg: string;
 
@@ -54,48 +54,19 @@ export class CreateInscricaoEducacaoDto {
 
   // 📚 Escolaridade
   @IsBoolean()
-  @IsOptional()
   possuiEnsinoFundamental: boolean;
 
-  @IsOptional()
-  @IsString()
-  ensinoFundamental?: string;
-
   @IsBoolean()
-  @IsOptional()
   possuiEnsinoMedio: boolean;
 
-  @IsOptional()
-  @IsString()
-  ensinoMedio?: string;
-
   @IsBoolean()
-  @IsOptional()
   possuiEnsinoSuperior: boolean;
 
-  @IsOptional()
-  @IsString()
-  ensinoSuperior?: string;
-
-
   @IsBoolean()
-  @IsOptional()
   possuiCursoAreaEducacao: boolean;
 
-  @IsOptional()
-  @IsString()
-  cursoAreaEducacao?: string;
-
-
   @IsBoolean()
-  @IsOptional()
   possuiDoutorado: boolean;
-
-  @IsOptional()
-  @IsString()
-  doutorado?: string;
-
-
 
   @IsOptional()
   @IsNumber()

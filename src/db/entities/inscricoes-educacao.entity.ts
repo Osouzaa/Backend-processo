@@ -25,10 +25,10 @@ export class InscricaoEducacao {
   @Column({ nullable: true })
   pontuacao: number;
 
-  @Column({ type: 'date' })
-  dataNascimento: Date;
-
   @Column()
+  dataNascimento: string;
+
+  @Column({ nullable: true })
   rg: string;
 
   @Column()
@@ -79,7 +79,6 @@ export class InscricaoEducacao {
   @Column({ nullable: true })
   tempoExperiencia: number;
 
-  // Relacionamento: Uma inscrição pode ter vários arquivos
   @OneToMany(() => File, (file) => file.inscricao, { cascade: true })
   files: File[];
 }
