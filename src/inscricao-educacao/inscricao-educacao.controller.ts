@@ -11,46 +11,10 @@ export class InscricaoEducacaoController {
   constructor(private readonly inscricaoEducacaoService: InscricaoEducacaoService) { }
 
   @Post()
-  @UseInterceptors(
-    FileFieldsInterceptor(
-      [
-        { name: 'ensinoFundamental', maxCount: 1 },
-        { name: 'ensinoMedio', maxCount: 1 },
-        { name: 'ensinoSuperior', maxCount: 1 },
-        { name: 'cursoEducacao', maxCount: 1 },
-        { name: 'doutorado', maxCount: 1 },
-        { name: 'laudoPcd', maxCount: 1 },
-      ],
-      {
-        storage: diskStorage({
-          destination: './uploads', // Diretório onde os arquivos serão armazenados
-          filename: (req, file, callback) => {
-            const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1e9);
-            const ext = extname(file.originalname);
-            callback(null, `${file.fieldname}-${uniqueSuffix}${ext}`);
-          },
-        }),
-      },
-    ),
-  )
   create(
     @Body() createInscricaoEducacaoDto: CreateInscricaoEducacaoDto,
-    @UploadedFiles()
-    files: {
-      ensinoFundamental?: Express.Multer.File[],
-      ensinoMedio?: Express.Multer.File[],
-      comprovanteEnsinoSuperior?: Express.Multer.File[],
-      ensinoSuperior?: Express.Multer.File[],
-      doutorado?: Express.Multer.File[],
-      laudoPcd?: Express.Multer.File[],
-    }
   ) {
-
-    const allFiles: Express.Multer.File[] = Object.values(files)
-      .flat()
-      .filter(Boolean);
-
-    return this.inscricaoEducacaoService.create(createInscricaoEducacaoDto, allFiles);
+    return this.inscricaoEducacaoService.create(createInscricaoEducacaoDto);
   }
 
   @Get()

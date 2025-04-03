@@ -4,7 +4,9 @@ import {
   Column,
   CreateDateColumn,
   UpdateDateColumn,
+  OneToMany,
 } from 'typeorm';
+import { File } from './file.entity';
 
 @Entity('inscricoes_educacao')
 export class InscricaoEducacao {
@@ -17,12 +19,11 @@ export class InscricaoEducacao {
   @UpdateDateColumn()
   atualizadoEm: Date;
 
-  // 📌 Informações pessoais do candidato
   @Column()
   nomeCompleto: string;
 
   @Column({ nullable: true })
-  pontuacao: number
+  pontuacao: number;
 
   @Column({ type: 'date' })
   dataNascimento: Date;
@@ -55,40 +56,30 @@ export class InscricaoEducacao {
   pcd: string;
 
   @Column({ nullable: true })
-  laudoPcd: string; // 📂 Link do anexo do laudo PCD
+  laudoPcd: string; // Remover depois que a entidade `File` for usada
 
   @Column()
   cargoFuncao: string;
 
-  // 📚 Escolaridade
   @Column({ default: false, nullable: true })
-  possuiEnsinoFundamental: boolean; // 📌 Indica se possui ensino fundamental
-  @Column({ nullable: true })
-  ensinoFundamental: string; // 📂 Link do anexo
+  possuiEnsinoFundamental: boolean;
 
   @Column({ default: false, nullable: true })
-  possuiEnsinoMedio: boolean; // 📌 Indica se possui ensino médio
-  @Column({ nullable: true })
-  ensinoMedio: string; // 📂 Link do anexo
+  possuiEnsinoMedio: boolean;
 
   @Column({ default: false, nullable: true })
-  possuiEnsinoSuperior: boolean; // 📌 Indica se possui ensino superior
-  @Column({ nullable: true })
-  ensinoSuperior: string; // 📂 Link do anexo
-
+  possuiEnsinoSuperior: boolean;
 
   @Column({ default: false, nullable: true })
-  possuiCursoAreaEducacao: boolean; // 📌 Indica se possui curso na área de educação
-  @Column({ nullable: true })
-  cursoAreaEducacao: string; // 📂 Link do anexo
-
+  possuiCursoAreaEducacao: boolean;
 
   @Column({ default: false, nullable: true })
-  possuiDoutorado: boolean; // 📌 Indica se possui doutorado
-  @Column({ nullable: true })
-  doutorado: string; // 📂 Link do anexo
-
+  possuiDoutorado: boolean;
 
   @Column({ nullable: true })
-  tempoExperiencia: number
+  tempoExperiencia: number;
+
+  // Relacionamento: Uma inscrição pode ter vários arquivos
+  @OneToMany(() => File, (file) => file.inscricao, { cascade: true })
+  files: File[];
 }
