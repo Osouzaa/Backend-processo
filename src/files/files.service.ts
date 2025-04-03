@@ -99,4 +99,86 @@ export class FilesService {
 
     return { message: "Arquivos salvos com sucesso!", files: savedFiles };
   }
+  async createUploadDoutorado(dto: CreateFileDto, files: Express.Multer.File[]) {
+    const inscricao = await this.inscricaoService.findOne(+dto.inscricaoId);
+
+    if (!inscricao) {
+      throw new Error("Inscrição não encontrada!");
+    }
+
+    function sanitize(str: string): string {
+      return str.normalize("NFD")
+        .replace(/[\u0300-\u036f]/g, "")
+        .replace(/\s+/g, "_")
+        .replace(/[^\w\s]/gi, "");
+    }
+
+    const nomeSanitizado = sanitize(inscricao.nomeCompleto);
+    const cpfSanitizado = inscricao.cpf.replace(/\D/g, "");
+
+    const userDir = path.join(__dirname, '../../uploads', `${nomeSanitizado}_${cpfSanitizado}`);
+
+    if (!fs.existsSync(userDir)) {
+      fs.mkdirSync(userDir, { recursive: true });
+    }
+
+    // Processar todos os arquivos recebidos
+    const savedFiles = await Promise.all(
+      files.map(async (file, index) => {
+        const fileName = `Comprovante_Doutorado_${index + 1}.pdf`;
+        const filePath = path.join(userDir, fileName);
+
+        fs.writeFileSync(filePath, file.buffer);
+
+        const newFile = this.filesRepository.create({
+          fileName,
+          path: filePath,
+          inscricao: inscricao,
+        });
+
+        return this.filesRepository.save(newFile);
+      })
+    );
+
+    return { message: "Arquivos salvos com sucesso!", files: savedFiles };
+  }
+
+  async uploadCursoEducacao(dto: CreateFileDto, file: Express.Multer.File) {
+
+    const inscricao = await this.inscricaoService.findOne(+dto.inscricaoId);
+
+    if (!inscricao) {
+      throw new Error("Inscrição não encontrada!");
+    }
+
+    function sanitize(str: string): string {
+      return str.normalize("NFD")
+        .replace(/[\u0300-\u036f]/g, "")
+        .replace(/\s+/g, "_")
+        .replace(/[^\w\s]/gi, "");
+    }
+
+    const nomeSanitizado = sanitize(inscricao.nomeCompleto);
+    const cpfSanitizado = inscricao.cpf.replace(/\D/g, "");
+
+    const userDir = path.join(__dirname, '../../uploads', `${nomeSanitizado}_${cpfSanitizado}`);
+
+    if (!fs.existsSync(userDir)) {
+      fs.mkdirSync(userDir, { recursive: true });
+    }
+
+    const filePath = path.join(userDir, 'comprovante-curso-educação.pdf');
+
+    fs.writeFileSync(filePath, file.buffer);
+
+    const newFile = this.filesRepository.create({
+      fileName: "comprovante-curso-educação.pdf",
+      path: filePath,
+      inscricao: inscricao,
+    });
+
+    await this.filesRepository.save(newFile);
+
+    return { message: "Arquivo salvo com sucesso!", file: newFile };
+  }
 }

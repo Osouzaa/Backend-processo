@@ -17,12 +17,32 @@ export class FilesController {
   }
 
   @Post('graduacao')
-  @UseInterceptors(FilesInterceptor('graduacao', 10))
+  @UseInterceptors(FilesInterceptor('graduacao', 5))
   uploadGraduacao(
     @UploadedFiles() files: Express.Multer.File[],
     @Body() createFileDTO: CreateFileDto
   ) {
     return this.fileService.createUploadGraduacao(createFileDTO, files);
   }
+
+  @Post('doutorado')
+  @UseInterceptors(FilesInterceptor('doutorado', 5))
+  uploadDoutorado(
+    @UploadedFiles() files: Express.Multer.File[],
+    @Body() createFileDTO: CreateFileDto
+  ) {
+    return this.fileService.createUploadDoutorado(createFileDTO, files);
+  }
+
+  @Post('cursoEducacao')
+  @UseInterceptors(FileInterceptor('cursoEducacao'))
+  uploadCursoEducacao(
+    @UploadedFile() file: Express.Multer.File,
+    @Body() createFileDTO: CreateFileDto
+  ) {
+    return this.fileService.uploadCursoEducacao(createFileDTO, file);
+  }
+
+
 
 }
