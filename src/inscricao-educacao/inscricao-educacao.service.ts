@@ -31,7 +31,6 @@ export class InscricaoEducacaoService {
       fs.mkdirSync(candidateDir, { recursive: true });
     }
 
-    // Função para limpar o nome do arquivo
     function sanitizeFileName(filename: string): string {
       return filename.normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/\s+/g, "_");
     }
@@ -62,8 +61,6 @@ export class InscricaoEducacaoService {
 
     // Salvar no banco de dados
     await this.inscricaoEducacaoRepository.save(novaInscricao);
-
-    console.log('Inscrição criada:', novaInscricao);
 
     return novaInscricao;
   }
