@@ -7,9 +7,6 @@ export class File {
   id: number;
 
   @Column()
-  filename: string;
-
-  @Column()
   path: string;
 
   @CreateDateColumn()

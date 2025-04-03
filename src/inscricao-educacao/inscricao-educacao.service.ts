@@ -14,7 +14,6 @@ export class InscricaoEducacaoService {
     private readonly inscricaoEducacaoRepository: Repository<InscricaoEducacao>,
   ) { }
 
-
   async create(
     dto: CreateInscricaoEducacaoDto,
     files: { cpfFile?: Express.Multer.File[]; comprovanteEndereco?: Express.Multer.File[] }
@@ -24,7 +23,9 @@ export class InscricaoEducacaoService {
       throw new ConflictException('Candidato já cadastrado!');
     }
 
-    const candidateDir = path.join(__dirname, '../../uploads', dto.nomeCompleto.replace(/\s+/g, '_'));
+    // Diretório com Nome + CPF
+    const candidateDir = path.join(__dirname, '../../uploads', `${dto.nomeCompleto.replace(/\s+/g, '_')}_${dto.cpf}`);
+
     if (!fs.existsSync(candidateDir)) {
       fs.mkdirSync(candidateDir, { recursive: true });
     }
@@ -38,7 +39,7 @@ export class InscricaoEducacaoService {
     }
 
     if (files.comprovanteEndereco?.length) {
-      const addressFilePath = path.join(candidateDir, 'comprovante_endereco.pdf'); // Nome fixo: comprovante_endereco.pdf
+      const addressFilePath = path.join(candidateDir, 'comprovante_endereco.pdf');
       fs.writeFileSync(addressFilePath, files.comprovanteEndereco[0].buffer);
       savedFiles['comprovanteEndereco'] = addressFilePath;
     }
@@ -57,39 +58,28 @@ export class InscricaoEducacaoService {
   }
 
   async findByCpf(cpf: string) {
-    const candidate = await this.inscricaoEducacaoRepository.findOne({
-      where: {
-        cpf
-      }
-    })
-
-    return candidate
+    return this.inscricaoEducacaoRepository.findOne({ where: { cpf } });
   }
 
   async findAll() {
-    const candidates = await this.inscricaoEducacaoRepository.find()
-    return candidates
+    return this.inscricaoEducacaoRepository.find();
   }
 
   async findOne(id: number) {
-    const inscricao = await this.inscricaoEducacaoRepository.findOne({
-      where: {
-        id
-      }
-    })
+    const inscricao = await this.inscricaoEducacaoRepository.findOne({ where: { id } });
 
     if (!inscricao) {
-      throw new Error('Inscricao not found')
+      throw new Error('Inscrição não encontrada');
     }
 
-    return inscricao
+    return inscricao;
   }
 
   update(id: number, updateInscricaoEducacaoDto: UpdateInscricaoEducacaoDto) {
-    return `This action updates a #${id} inscricaoEducacao`;
+    return `Esta ação atualiza a inscrição #${id}`;
   }
 
   remove(id: number) {
-    return `This action removes a #${id} inscricaoEducacao`;
+    return `Esta ação remove a inscrição #${id}`;
   }
 }

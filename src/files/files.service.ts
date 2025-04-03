@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { File } from 'src/db/entities/file.entity';
@@ -9,6 +9,8 @@ import { InscricaoEducacaoService } from 'src/inscricao-educacao/inscricao-educa
 
 @Injectable()
 export class FilesService {
+  private readonly logger = new Logger(FilesService.name);
+
   constructor(
     @InjectRepository(File)
     private filesRepository: Repository<File>,
@@ -16,18 +18,49 @@ export class FilesService {
   ) { }
 
   async create(dto: CreateFileDto, file: Express.Multer.File) {
+    this.logger.log(`Buscando inscrição ID: ${dto.inscricaoId}`);
 
     const inscricao = await this.inscricaoService.findOne(+dto.inscricaoId);
 
-    const userDir = path.join(__dirname, '../../uploads', inscricao.nomeCompleto.replace(/\s+/g, '_'));
-
-    if (!fs.existsSync(userDir)) {
-      fs.mkdirSync(userDir, { recursive: true });
+    if (!inscricao) {
+      this.logger.error(`Inscrição ${dto.inscricaoId} não encontrada!`);
+      throw new Error("Inscrição não encontrada!");
     }
 
-    const filePath = path.join(userDir, 'comprovante_ensino_medio.pdf'); // Nome fixo
+    this.logger.log(`Inscrição encontrada: ${inscricao.nomeCompleto} (${inscricao.cpf})`);
+
+    function sanitize(str: string): string {
+      return str.normalize("NFD")
+        .replace(/[\u0300-\u036f]/g, "")
+        .replace(/\s+/g, "_")
+        .replace(/[^\w\s]/gi, "");
+    }
+
+    const nomeSanitizado = sanitize(inscricao.nomeCompleto);
+    const cpfSanitizado = inscricao.cpf.replace(/\D/g, "");
+
+    const userDir = path.join(__dirname, '../../uploads', `${nomeSanitizado}_${cpfSanitizado}`);
+
+    if (!fs.existsSync(userDir)) {
+      this.logger.log(`Criando diretório: ${userDir}`);
+      fs.mkdirSync(userDir, { recursive: true });
+    } else {
+      this.logger.log(`Diretório já existe: ${userDir}`);
+    }
+
+    const filePath = path.join(userDir, 'comprovante_ensino_medio.pdf');
+    this.logger.log(`Salvando arquivo em: ${filePath}`);
+
     fs.writeFileSync(filePath, file.buffer);
 
-    return { message: "Arquivo salvo com sucesso!", path: filePath };
+    const newFile = this.filesRepository.create({
+      path: filePath,
+      inscricao: inscricao,
+    });
+
+    await this.filesRepository.save(newFile);
+    this.logger.log(`Arquivo salvo no banco de dados com ID: ${newFile.id}`);
+
+    return { message: "Arquivo salvo com sucesso!", file: newFile };
   }
 }
