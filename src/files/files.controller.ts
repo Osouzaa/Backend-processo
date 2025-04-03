@@ -1,4 +1,4 @@
-import { Controller, Post, UploadedFile, UseInterceptors } from "@nestjs/common";
+import { Body, Controller, Post, UploadedFile, UseInterceptors } from "@nestjs/common";
 import { FileInterceptor } from "@nestjs/platform-express";
 import { CreateFileDto } from "./dto/create.file.dto";
 import { FilesService } from "./files.service";
@@ -11,8 +11,9 @@ export class FilesController {
   @UseInterceptors(FileInterceptor('ensinoMedioFile'))
   uploadEnsinoMedio(
     @UploadedFile() file: Express.Multer.File,
-    createFileDTO: CreateFileDto
+    @Body() createFileDTO: CreateFileDto
   ) {
+    console.log(file, createFileDTO);
     return this.fileService.create(createFileDTO, file);
   }
 }

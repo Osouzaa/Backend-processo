@@ -42,14 +42,10 @@ export class FilesService {
     const userDir = path.join(__dirname, '../../uploads', `${nomeSanitizado}_${cpfSanitizado}`);
 
     if (!fs.existsSync(userDir)) {
-      this.logger.log(`Criando diretório: ${userDir}`);
       fs.mkdirSync(userDir, { recursive: true });
-    } else {
-      this.logger.log(`Diretório já existe: ${userDir}`);
     }
 
     const filePath = path.join(userDir, 'comprovante_ensino_medio.pdf');
-    this.logger.log(`Salvando arquivo em: ${filePath}`);
 
     fs.writeFileSync(filePath, file.buffer);
 
@@ -59,7 +55,6 @@ export class FilesService {
     });
 
     await this.filesRepository.save(newFile);
-    this.logger.log(`Arquivo salvo no banco de dados com ID: ${newFile.id}`);
 
     return { message: "Arquivo salvo com sucesso!", file: newFile };
   }
