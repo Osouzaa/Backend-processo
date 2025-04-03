@@ -1,5 +1,5 @@
-import { Body, Controller, Post, UploadedFile, UseInterceptors } from "@nestjs/common";
-import { FileInterceptor } from "@nestjs/platform-express";
+import { Body, Controller, Post, UploadedFile, UploadedFiles, UseInterceptors } from "@nestjs/common";
+import { FileInterceptor, FilesInterceptor } from "@nestjs/platform-express";
 import { CreateFileDto } from "./dto/create.file.dto";
 import { FilesService } from "./files.service";
 
@@ -18,12 +18,13 @@ export class FilesController {
   }
 
   @Post('graduacao')
-  @UseInterceptors(FileInterceptor('graduacao'))
-  uploadGraducao(
-    @UploadedFile() file: Express.Multer.File,
+  @UseInterceptors(FilesInterceptor('graduacao', 10)) // Permite até 10 arquivos
+  uploadGraduacao(
+    @UploadedFiles() files: Express.Multer.File[],
     @Body() createFileDTO: CreateFileDto
   ) {
-    console.log(file, createFileDTO);
-    return this.fileService.createUploadGraduacao(createFileDTO, file);
+    console.log(files, createFileDTO);
+    return this.fileService.createUploadGraduacao(createFileDTO, files);
   }
+
 }

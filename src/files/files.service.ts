@@ -56,8 +56,7 @@ export class FilesService {
     return { message: "Arquivo salvo com sucesso!", file: newFile };
   }
 
-  async createUploadGraduacao(dto: CreateFileDto, file: Express.Multer.File) {
-
+  async createUploadGraduacao(dto: CreateFileDto, files: Express.Multer.File[]) {
     const inscricao = await this.inscricaoService.findOne(+dto.inscricaoId);
 
     if (!inscricao) {
@@ -80,18 +79,24 @@ export class FilesService {
       fs.mkdirSync(userDir, { recursive: true });
     }
 
-    const filePath = path.join(userDir, 'Comprovante Graduação.pdf');
+    // Processar todos os arquivos recebidos
+    const savedFiles = await Promise.all(
+      files.map(async (file, index) => {
+        const fileName = `Comprovante_Graduacao_${index + 1}.pdf`;
+        const filePath = path.join(userDir, fileName);
 
-    fs.writeFileSync(filePath, file.buffer);
+        fs.writeFileSync(filePath, file.buffer);
 
-    const newFile = this.filesRepository.create({
-      fileName: "comprovante_ensino_medio.pdf",
-      path: filePath,
-      inscricao: inscricao,
-    });
+        const newFile = this.filesRepository.create({
+          fileName,
+          path: filePath,
+          inscricao: inscricao,
+        });
 
-    await this.filesRepository.save(newFile);
+        return this.filesRepository.save(newFile);
+      })
+    );
 
-    return { message: "Arquivo salvo com sucesso!", file: newFile };
+    return { message: "Arquivos salvos com sucesso!", files: savedFiles };
   }
 }
