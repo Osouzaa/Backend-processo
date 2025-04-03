@@ -13,17 +13,15 @@ export class FilesController {
     @UploadedFile() file: Express.Multer.File,
     @Body() createFileDTO: CreateFileDto
   ) {
-    console.log(file, createFileDTO);
     return this.fileService.create(createFileDTO, file);
   }
 
   @Post('graduacao')
-  @UseInterceptors(FilesInterceptor('graduacao', 10)) // Permite até 10 arquivos
+  @UseInterceptors(FilesInterceptor('graduacao', 10))
   uploadGraduacao(
     @UploadedFiles() files: Express.Multer.File[],
     @Body() createFileDTO: CreateFileDto
   ) {
-    console.log(files, createFileDTO);
     return this.fileService.createUploadGraduacao(createFileDTO, files);
   }
 
