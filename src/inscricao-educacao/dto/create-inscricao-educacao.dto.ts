@@ -17,6 +17,10 @@ export class CreateInscricaoEducacaoDto {
   @IsString()
   cpf: string;
 
+  // @IsString()
+  // @IsNotEmpty()
+  // cpfLink: string;
+
   @IsNotEmpty()
   @IsString()
   genero: string;
@@ -82,21 +86,26 @@ export class CreateInscricaoEducacaoDto {
   estado: string;
 
 
+  // @IsString()
+  // @IsNotEmpty()
+  // comprovanteEnderecoLink: string;
+
+
   // 📚 Escolaridade
-  @IsBoolean()
-  possuiEnsinoFundamental: boolean;
+  @IsString()
+  possuiEnsinoFundamental: string;
 
-  @IsBoolean()
-  possuiEnsinoMedio: boolean;
+  @IsString()
+  possuiEnsinoMedio: string;
 
-  @IsBoolean()
-  possuiEnsinoSuperior: boolean;
+  @IsString()
+  possuiEnsinoSuperior: string;
 
-  @IsBoolean()
-  possuiCursoAreaEducacao: boolean;
+  @IsString()
+  possuiCursoAreaEducacao: string;
 
-  @IsBoolean()
-  possuiDoutorado: boolean;
+  @IsString()
+  possuiDoutorado: string;
 
   @IsOptional()
   @IsNumber()

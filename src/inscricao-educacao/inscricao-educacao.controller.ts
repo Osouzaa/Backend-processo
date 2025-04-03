@@ -13,12 +13,13 @@ export class InscricaoEducacaoController {
 
   @Post()
   @UseInterceptors(FileFieldsInterceptor([
-    { name: 'cpf', maxCount: 1 },
+    { name: 'cpfFile', maxCount: 1 },
     { name: 'comprovanteEndereco', maxCount: 1 },
   ]))
   create(
     @Body() createInscricaoEducacaoDto: CreateInscricaoEducacaoDto,
-    @UploadedFiles() files: { cpf?: Express.Multer.File[], comprovanteEndereco?: Express.Multer.File[] }
+    @UploadedFiles() files: { cpfFile?: Express.Multer.File[], comprovanteEndereco?: Express.Multer.File[] }
+
   ) {
     return this.inscricaoEducacaoService.create(createInscricaoEducacaoDto, files);
   }

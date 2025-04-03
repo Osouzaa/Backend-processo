@@ -75,7 +75,7 @@ export class InscricaoEducacao {
   @Column()
   logradouro: string;
 
-  @Column()
+  @Column({ nullable: true })
   complemento: string;
 
   @Column()
@@ -90,22 +90,25 @@ export class InscricaoEducacao {
   @Column()
   estado: string;
 
+  @Column()
+  comprovanteEnderecoLink: string;
+
   ////
 
-  @Column({ default: false, nullable: true })
-  possuiEnsinoFundamental: boolean;
+  @Column({ nullable: true })
+  possuiEnsinoFundamental: string;
 
-  @Column({ default: false, nullable: true })
-  possuiEnsinoMedio: boolean;
+  @Column({ nullable: true })
+  possuiEnsinoMedio: string;
 
-  @Column({ default: false, nullable: true })
-  possuiEnsinoSuperior: boolean;
+  @Column({ nullable: true })
+  possuiEnsinoSuperior: string;
 
-  @Column({ default: false, nullable: true })
-  possuiCursoAreaEducacao: boolean;
+  @Column({ nullable: true })
+  possuiCursoAreaEducacao: string;
 
-  @Column({ default: false, nullable: true })
-  possuiDoutorado: boolean;
+  @Column({ nullable: true })
+  possuiDoutorado: string;
 
   @Column({ nullable: true })
   tempoExperiencia: number;
