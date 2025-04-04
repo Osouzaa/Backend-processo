@@ -108,6 +108,7 @@ export class InscricaoEducacao {
   @Column({ nullable: true })
   possuiEnsinoFundamental: string;
 
+
   @Column({ nullable: true })
   possuiEnsinoMedio: string;
 
@@ -115,10 +116,20 @@ export class InscricaoEducacao {
   possuiEnsinoSuperior: string;
 
   @Column({ nullable: true })
+  quantidadeEnsinoSuperior: string;
+
+
+  @Column({ nullable: true })
   possuiCursoAreaEducacao: string;
 
   @Column({ nullable: true })
+  quantidadeCursoAreaEducacao: string;
+
+  @Column({ nullable: true })
   possuiDoutorado: string;
+
+  @Column({ nullable: true })
+  quantidadeDoutorado: string;
 
   @Column({ nullable: true })
   tempoExperiencia: number;

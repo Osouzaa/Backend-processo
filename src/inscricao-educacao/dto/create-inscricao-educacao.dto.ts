@@ -104,6 +104,8 @@ export class CreateInscricaoEducacaoDto {
   @IsString()
   possuiEnsinoFundamental: string;
 
+
+
   @IsString()
   possuiEnsinoMedio: string;
 
@@ -111,10 +113,22 @@ export class CreateInscricaoEducacaoDto {
   possuiEnsinoSuperior: string;
 
   @IsString()
+  @IsOptional()
+  quantidadeEnsinoSuperior: string;
+
+  @IsString()
   possuiCursoAreaEducacao: string;
 
   @IsString()
+  @IsOptional()
+  quantidadeCursoAreaEducacao: string;
+
+  @IsString()
   possuiDoutorado: string;
+
+  @IsString()
+  @IsOptional()
+  quantidadeDoutorado: string;
 
   // 📊 Convertendo número corretamente
   @Transform(({ value }) => Number(value))
