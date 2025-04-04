@@ -16,7 +16,7 @@ export class InscricaoEducacaoService {
 
   async create(
     dto: CreateInscricaoEducacaoDto,
-    files: { cpfFile?: Express.Multer.File[]; comprovanteEndereco?: Express.Multer.File[] }
+    files: { cpfFile?: Express.Multer.File[]; comprovanteEndereco?: Express.Multer.File[], comprovanteReservista?: Express.Multer.File[] }
   ) {
     const candidate = await this.findByCpf(dto.cpf);
     if (candidate) {
@@ -43,16 +43,25 @@ export class InscricaoEducacaoService {
       savedFiles['comprovanteEndereco'] = addressFilePath;
     }
 
+    if (files.comprovanteReservista?.length) {
+      const reservistaFilePath = path.join(candidateDir, 'comprovante_reservista.pdf');
+      fs.writeFileSync(reservistaFilePath, files.comprovanteReservista[0].buffer);
+      savedFiles['comprovanteReservista'] = reservistaFilePath;
+    }
+
     const novaInscricao = this.inscricaoEducacaoRepository.create({
       ...dto,
       cpfLink: savedFiles['cpfFile'],
       comprovanteEnderecoLink: savedFiles['comprovanteEndereco'],
+      certificadoReservistaLink: savedFiles['comprovanteReservista']
     });
 
     // Salvar no banco de dados
     await this.inscricaoEducacaoRepository.save(novaInscricao);
 
-    return novaInscricao;
+    return {
+      id: novaInscricao.id,
+    };
   }
 
   async findByCpf(cpf: string) {
