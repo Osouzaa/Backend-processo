@@ -1,3 +1,4 @@
+import { Transform } from 'class-transformer';
 import { IsNotEmpty, IsOptional, IsBoolean, IsString, IsNumber } from 'class-validator';
 
 export class CreateInscricaoEducacaoDto {
@@ -41,9 +42,13 @@ export class CreateInscricaoEducacaoDto {
   @IsString()
   estadoCivil: string;
 
+  @IsOptional()
+  @IsString()
+  contatoTelefoneFixo: string;
+
   @IsNotEmpty()
   @IsString()
-  contato: string;
+  contatoCelular: string;
 
   @IsString()
   pcd: string;
@@ -51,6 +56,10 @@ export class CreateInscricaoEducacaoDto {
   @IsOptional()
   @IsString()
   laudoPcd?: string;
+
+  @IsOptional()
+  @IsString()
+  vagaDestinadaAPCD?: string;
 
   @IsNotEmpty()
   @IsString()
@@ -107,6 +116,8 @@ export class CreateInscricaoEducacaoDto {
   @IsString()
   possuiDoutorado: string;
 
+  // 📊 Convertendo número corretamente
+  @Transform(({ value }) => Number(value))
   @IsOptional()
   @IsNumber()
   tempoExperiencia?: number;

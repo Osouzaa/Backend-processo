@@ -18,6 +18,7 @@ export class InscricaoEducacaoService {
     dto: CreateInscricaoEducacaoDto,
     files: { cpfFile?: Express.Multer.File[]; comprovanteEndereco?: Express.Multer.File[], comprovanteReservista?: Express.Multer.File[] }
   ) {
+    console.log("DTOS", typeof (dto.possuiEnsinoFundamental))
     const candidate = await this.findByCpf(dto.cpf);
     if (candidate) {
       throw new ConflictException('Candidato já cadastrado!');

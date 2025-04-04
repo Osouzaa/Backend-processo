@@ -56,13 +56,13 @@ export class InscricaoEducacao {
   estadoCivil: string;
 
   @Column()
-  contato: string;
-
-  @Column()
   pcd: string;
 
   @Column({ nullable: true })
   laudoPcd: string; // Remover depois que a entidade `File` for usada
+
+  @Column({ nullable: true })
+  vagaDestinadaAPCD: string;
 
   @Column()
   cargoFuncao: string;
@@ -70,7 +70,14 @@ export class InscricaoEducacao {
   // Endereço
 
   @Column({ nullable: true })
-  telefone: string;
+  contatoTelefoneFixo: string;
+
+  @Column({ nullable: true })
+  contatoCelular: string;
+
+
+
+
 
   @Column()
   cep: string;
