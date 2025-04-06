@@ -3,6 +3,7 @@ import { Module } from '@nestjs/common';
 import { env } from 'src/env';
 import { InscricaoEducacao } from './entities/inscricoes-educacao.entity';
 import { File } from './entities/file.entity';
+import { Candidato } from './entities/candidato.entity';
 
 @Module({
   imports: [
@@ -13,7 +14,7 @@ import { File } from './entities/file.entity';
       username: env.DB_USERNAME,
       password: env.DB_PASSWORD,
       database: env.DB_NAME,
-      entities: [InscricaoEducacao, File],
+      entities: [InscricaoEducacao, File, Candidato],
       // ssl: true,
       synchronize: true,
     }),

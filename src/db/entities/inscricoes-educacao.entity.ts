@@ -5,8 +5,10 @@ import {
   CreateDateColumn,
   UpdateDateColumn,
   OneToMany,
+  ManyToOne,
 } from 'typeorm';
 import { File } from './file.entity';
+import { Candidato } from './candidato.entity';
 
 @Entity('inscricoes_educacao')
 export class InscricaoEducacao {
@@ -139,6 +141,9 @@ export class InscricaoEducacao {
 
   @Column({ nullable: true })
   tempoExperiencia: number;
+
+  @ManyToOne(() => Candidato, (candidato) => candidato.inscricoesEducacao, { eager: true })
+  candidato: Candidato;
 
   @OneToMany(() => File, (file) => file.inscricao, { cascade: true })
   files: File[];
