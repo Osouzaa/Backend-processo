@@ -16,8 +16,14 @@ export class InscricaoEducacaoService {
 
   async create(
     dto: CreateInscricaoEducacaoDto,
-    files: { cpfFile?: Express.Multer.File[]; comprovanteEndereco?: Express.Multer.File[], comprovanteReservista?: Express.Multer.File[] }
+    files: {
+      cpfFile?: Express.Multer.File[];
+      comprovanteEndereco?: Express.Multer.File[];
+      comprovanteReservista?: Express.Multer.File[];
+    }
   ) {
+
+    console.log(typeof dto.tempoExperiencia)
     const candidate = await this.findByCpf(dto.cpf);
     if (candidate) {
       throw new ConflictException('Candidato já cadastrado!');
@@ -49,20 +55,59 @@ export class InscricaoEducacaoService {
       savedFiles['comprovanteReservista'] = reservistaFilePath;
     }
 
+    const pontuacaoCalculada = this.calcularPontuacao(dto);
+
     const novaInscricao = this.inscricaoEducacaoRepository.create({
       ...dto,
+      pontuacao: pontuacaoCalculada,
       cpfLink: savedFiles['cpfFile'],
       comprovanteEnderecoLink: savedFiles['comprovanteEndereco'],
-      certificadoReservistaLink: savedFiles['comprovanteReservista']
+      certificadoReservistaLink: savedFiles['comprovanteReservista'],
     });
 
-    // Salvar no banco de dados
     await this.inscricaoEducacaoRepository.save(novaInscricao);
 
     return {
       id: novaInscricao.id,
+      pontuacao: novaInscricao.pontuacao,
     };
   }
+
+
+
+  private calcularPontuacao(dto: CreateInscricaoEducacaoDto): number {
+    let pontuacao = 0;
+    if (dto.cargoFuncao === "Auxiliar de Secretaria") {
+      if (dto.possuiEnsinoMedio) {
+        pontuacao += 10;
+        console.log("Possui medio")
+      }
+      if (dto.possuiEnsinoSuperior) {
+        pontuacao += 10;
+        console.log("Possui superior")
+      }
+      if (Number(dto.tempoExperiencia) === 1) {
+        pontuacao += 10;
+      }
+      if (Number(dto.tempoExperiencia) === 2) {
+        pontuacao += 20;
+        console.log("Possui 2 anos");
+      }
+
+      if (Number(dto.tempoExperiencia) === 3) {
+        pontuacao += 30;
+      }
+      if (Number(dto.tempoExperiencia) === 4) {
+        pontuacao += 40;
+      }
+      if (Number(dto.tempoExperiencia) === 5) {
+        pontuacao += 50;
+      }
+    }
+
+    return pontuacao;
+  }
+
 
   async findByCpf(cpf: string) {
     return this.inscricaoEducacaoRepository.findOne({ where: { cpf } });

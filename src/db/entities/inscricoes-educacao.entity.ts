@@ -59,7 +59,7 @@ export class InscricaoEducacao {
   pcd: string;
 
   @Column({ nullable: true })
-  laudoPcd: string; // Remover depois que a entidade `File` for usada
+  laudoPcd: string;
 
   @Column({ nullable: true })
   vagaDestinadaAPCD: string;
@@ -74,10 +74,6 @@ export class InscricaoEducacao {
 
   @Column({ nullable: true })
   contatoCelular: string;
-
-
-
-
 
   @Column()
   cep: string;
@@ -118,7 +114,6 @@ export class InscricaoEducacao {
   @Column({ nullable: true })
   quantidadeEnsinoSuperior: string;
 
-
   @Column({ nullable: true })
   possuiCursoAreaEducacao: string;
 
@@ -130,6 +125,18 @@ export class InscricaoEducacao {
 
   @Column({ nullable: true })
   quantidadeDoutorado: string;
+
+  @Column({ nullable: true })
+  possuiMestrado: string;
+
+  @Column({ nullable: true })
+  quantidadeMestrado: string;
+
+  @Column({ nullable: true })
+  possuiEspecializacao: string;
+
+  @Column({ nullable: true })
+  quantidadeEspecilizacao: string;
 
   @Column({ nullable: true })
   tempoExperiencia: number;

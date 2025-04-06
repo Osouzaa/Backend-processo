@@ -130,6 +130,22 @@ export class CreateInscricaoEducacaoDto {
   @IsOptional()
   quantidadeDoutorado: string;
 
+  @IsString()
+  @IsOptional()
+  possuiMestrado: string;
+
+  @IsString()
+  @IsOptional()
+  quantidadeMestrado: string;
+
+  @IsString()
+  @IsOptional()
+  possuiEspecializacao: string;
+
+  @IsString()
+  @IsOptional()
+  quantidadeEspecilizacao: string;
+
   // 📊 Convertendo número corretamente
   @Transform(({ value }) => Number(value))
   @IsOptional()
