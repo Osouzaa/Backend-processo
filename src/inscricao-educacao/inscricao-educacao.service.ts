@@ -77,23 +77,19 @@ export class InscricaoEducacaoService {
 
   private calcularPontuacao(dto: CreateInscricaoEducacaoDto): number {
     let pontuacao = 0;
-    if (dto.cargoFuncao === "Auxiliar de Secretaria") {
+    if (dto.escolaridade === "Fundamental") {
       if (dto.possuiEnsinoMedio) {
         pontuacao += 10;
-        console.log("Possui medio")
       }
       if (dto.possuiEnsinoSuperior) {
         pontuacao += 10;
-        console.log("Possui superior")
       }
       if (Number(dto.tempoExperiencia) === 1) {
         pontuacao += 10;
       }
       if (Number(dto.tempoExperiencia) === 2) {
         pontuacao += 20;
-        console.log("Possui 2 anos");
       }
-
       if (Number(dto.tempoExperiencia) === 3) {
         pontuacao += 30;
       }
@@ -104,6 +100,71 @@ export class InscricaoEducacaoService {
         pontuacao += 50;
       }
     }
+
+    if (dto.escolaridade === "Médio") {
+      if (dto.possuiEnsinoSuperior) {
+        pontuacao += 10;
+      }
+
+      if (dto.possuiCursoAreaEducacao) {
+        pontuacao += 10
+      }
+
+      if (Number(dto.tempoExperiencia) === 1) {
+        pontuacao += 10;
+      }
+      if (Number(dto.tempoExperiencia) === 2) {
+        pontuacao += 20;
+      }
+      if (Number(dto.tempoExperiencia) === 3) {
+        pontuacao += 30;
+      }
+      if (Number(dto.tempoExperiencia) === 4) {
+        pontuacao += 40;
+      }
+      if (Number(dto.tempoExperiencia) === 5) {
+        pontuacao += 50;
+      }
+    }
+
+    if (dto.escolaridade === "Superior") {
+      if (dto.possuiDoutorado) {
+        pontuacao += 20;
+      }
+
+      if (dto.possuiMestrado) {
+        pontuacao += 10
+      }
+
+      if (dto.possuiEspecializacao) {
+        if (Number(dto.quantidadeEspecilizacao) === 1) {
+          pontuacao += 5;
+        }
+        if (Number(dto.quantidadeEspecilizacao) === 2) {
+          pontuacao += 10;
+        }
+        if (Number(dto.quantidadeEspecilizacao) === 3) {
+          pontuacao += 15;
+        }
+      }
+      if (Number(dto.tempoExperiencia) === 1) {
+        pontuacao += 5;
+      }
+      if (Number(dto.tempoExperiencia) === 2) {
+        pontuacao += 10;
+        console.log("Possui 2 anos");
+      }
+      if (Number(dto.tempoExperiencia) === 3) {
+        pontuacao += 15;
+      }
+      if (Number(dto.tempoExperiencia) === 4) {
+        pontuacao += 20;
+      }
+      if (Number(dto.tempoExperiencia) === 5) {
+        pontuacao += 25;
+      }
+    }
+
 
     return pontuacao;
   }

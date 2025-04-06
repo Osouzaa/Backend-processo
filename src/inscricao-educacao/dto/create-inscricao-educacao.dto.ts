@@ -10,6 +10,10 @@ export class CreateInscricaoEducacaoDto {
   @IsString()
   dataNascimento: string;
 
+  @IsNotEmpty()
+  @IsString()
+  escolaridade: string
+
   @IsOptional()
   @IsString()
   rg: string;
@@ -50,6 +54,7 @@ export class CreateInscricaoEducacaoDto {
   @IsString()
   contatoCelular: string;
 
+  @IsOptional()
   @IsString()
   pcd: string;
 

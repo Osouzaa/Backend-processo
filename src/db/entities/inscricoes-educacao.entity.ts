@@ -25,6 +25,9 @@ export class InscricaoEducacao {
   @Column({ nullable: true })
   pontuacao: number;
 
+  @Column({ nullable: true })
+  escolaridade: string;
+
   @Column()
   dataNascimento: string;
 
@@ -55,7 +58,7 @@ export class InscricaoEducacao {
   @Column()
   estadoCivil: string;
 
-  @Column()
+  @Column({ nullable: true })
   pcd: string;
 
   @Column({ nullable: true })
@@ -123,14 +126,10 @@ export class InscricaoEducacao {
   @Column({ nullable: true })
   possuiDoutorado: string;
 
-  @Column({ nullable: true })
-  quantidadeDoutorado: string;
 
   @Column({ nullable: true })
   possuiMestrado: string;
 
-  @Column({ nullable: true })
-  quantidadeMestrado: string;
 
   @Column({ nullable: true })
   possuiEspecializacao: string;
