@@ -11,7 +11,8 @@ const envSchema = z.object({
   DB_NAME: z.string(),
   JWT_SECRET: z.string(),
   USER_ID: z.string(),
-  PRIVATE_KEY: z.string()
+  PRIVATE_KEY: z.string(),
+  BASE_URL: z.string()
 });
 
 const _env = envSchema.safeParse(process.env)

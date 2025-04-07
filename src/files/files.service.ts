@@ -6,12 +6,13 @@ import * as fs from "fs";
 import * as path from "path";
 import { CreateFileDto } from "./dto/create.file.dto";
 import { InscricaoEducacaoService } from 'src/inscricao-educacao/inscricao-educacao.service';
+import { env } from 'src/env';
 
 @Injectable()
 export class FilesService {
   private readonly logger = new Logger(FilesService.name);
 
-  private readonly BASE_URL = 'http://172.17.47.42:3333/upload'; // Altere aqui para seu IP ou domínio
+  private readonly BASE_URL = env.BASE_URL; // Altere aqui para seu IP ou domínio
 
   constructor(
     @InjectRepository(File)
