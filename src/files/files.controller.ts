@@ -25,13 +25,13 @@ export class FilesController {
     return this.fileService.createUploadGraduacao(createFileDTO, files);
   }
 
-  @Post('doutorado')
-  @UseInterceptors(FilesInterceptor('doutorado', 5))
+  @Post('upload-doutorado')
+  @UseInterceptors(FileInterceptor('file'))
   uploadDoutorado(
-    @UploadedFiles() files: Express.Multer.File[],
+    @UploadedFile() file: Express.Multer.File,
     @Body() createFileDTO: CreateFileDto
   ) {
-    return this.fileService.createUploadDoutorado(createFileDTO, files);
+    return this.fileService.createUploadDoutorado(createFileDTO, file);
   }
 
   @Post('cursoEducacao')
