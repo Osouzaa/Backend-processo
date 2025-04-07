@@ -23,6 +23,7 @@ export class InscricaoEducacaoService {
       cpfFile?: Express.Multer.File[];
       comprovanteEndereco?: Express.Multer.File[];
       comprovanteReservista?: Express.Multer.File[];
+      laudoPcd?: Express.Multer.File[];
     }
   ) {
     const candidate = await this.findByCpf(dto.cpf);
@@ -73,6 +74,15 @@ export class InscricaoEducacaoService {
       savedFiles['comprovanteReservista'] = `${this.BASE_URL}/${userFolder}/${fileName}`;
     }
 
+    if (files.laudoPcd?.length) {
+      const fileName = 'comprovante_laudopcd.pdf';
+      const filePath = path.join(userDir, fileName);
+      fs.writeFileSync(filePath, files.laudoPcd[0].buffer);
+
+      savedFiles['comprovante_laudopcd'] = `${this.BASE_URL}/${userFolder}/${fileName}`;
+    }
+
+
     const pontuacaoCalculada = calcularPontuacao(dto);
 
     const novaInscricao = this.inscricaoEducacaoRepository.create({
@@ -81,6 +91,7 @@ export class InscricaoEducacaoService {
       cpfLink: savedFiles['cpfFile'],
       comprovanteEnderecoLink: savedFiles['comprovanteEndereco'],
       certificadoReservistaLink: savedFiles['comprovanteReservista'],
+      laudoPcd: savedFiles['comprovante_laudopcd'],
     });
 
     await this.inscricaoEducacaoRepository.save(novaInscricao);

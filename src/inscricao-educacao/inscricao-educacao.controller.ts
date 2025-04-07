@@ -14,6 +14,7 @@ export class InscricaoEducacaoController {
     { name: 'cpfFile', maxCount: 1 },
     { name: 'comprovanteEndereco', maxCount: 1 },
     { name: 'comprovanteReservista', maxCount: 1 },
+    { name: 'laudoPcd', maxCount: 1 },
   ]))
   create(
     @Body() createInscricaoEducacaoDto: CreateInscricaoEducacaoDto,
