@@ -1,3 +1,4 @@
+import { Transform } from 'class-transformer';
 import { IsNotEmpty, IsOptional, IsBoolean, IsString, IsNumber } from 'class-validator';
 
 export class CreateInscricaoEducacaoDto {
@@ -11,11 +12,19 @@ export class CreateInscricaoEducacaoDto {
 
   @IsNotEmpty()
   @IsString()
+  escolaridade: string
+
+  @IsOptional()
+  @IsString()
   rg: string;
 
   @IsNotEmpty()
   @IsString()
   cpf: string;
+
+  // @IsString()
+  // @IsNotEmpty()
+  // cpfLink: string;
 
   @IsNotEmpty()
   @IsString()
@@ -37,10 +46,15 @@ export class CreateInscricaoEducacaoDto {
   @IsString()
   estadoCivil: string;
 
+  @IsOptional()
+  @IsString()
+  contatoTelefoneFixo: string;
+
   @IsNotEmpty()
   @IsString()
-  contato: string;
+  contatoCelular: string;
 
+  @IsOptional()
   @IsString()
   pcd: string;
 
@@ -48,55 +62,97 @@ export class CreateInscricaoEducacaoDto {
   @IsString()
   laudoPcd?: string;
 
+  @IsOptional()
+  @IsString()
+  vagaDestinadaAPCD?: string;
+
   @IsNotEmpty()
   @IsString()
   cargoFuncao: string;
 
+  // Endereço
+
+  @IsString()
+  cep: string;
+
+  @IsString()
+  @IsNotEmpty()
+  logradouro: string;
+
+  @IsString()
+  @IsOptional()
+  complemento: string;
+
+  @IsString()
+  @IsNotEmpty()
+  numero: string;
+
+  @IsString()
+  @IsNotEmpty()
+  bairro: string;
+
+  @IsString()
+  @IsNotEmpty()
+  cidade: string;
+
+  @IsString()
+  @IsNotEmpty()
+  estado: string;
+
+
+  // @IsString()
+  // @IsNotEmpty()
+  // comprovanteEnderecoLink: string;
+
+
   // 📚 Escolaridade
-  @IsBoolean()
-  @IsOptional()
-  possuiEnsinoFundamental: boolean;
-
-  @IsOptional()
   @IsString()
-  ensinoFundamental?: string;
+  possuiEnsinoFundamental: string;
 
-  @IsBoolean()
-  @IsOptional()
-  possuiEnsinoMedio: boolean;
 
-  @IsOptional()
+
   @IsString()
-  ensinoMedio?: string;
+  possuiEnsinoMedio: string;
 
-  @IsBoolean()
-  @IsOptional()
-  possuiEnsinoSuperior: boolean;
-
-  @IsOptional()
   @IsString()
-  ensinoSuperior?: string;
+  possuiEnsinoSuperior: string;
 
-
-  @IsBoolean()
-  @IsOptional()
-  possuiCursoAreaEducacao: boolean;
-
-  @IsOptional()
   @IsString()
-  cursoAreaEducacao?: string;
-
-
-  @IsBoolean()
   @IsOptional()
-  possuiDoutorado: boolean;
+  quantidadeEnsinoSuperior: string;
 
-  @IsOptional()
   @IsString()
-  doutorado?: string;
+  possuiCursoAreaEducacao: string;
 
+  @IsString()
+  @IsOptional()
+  quantidadeCursoAreaEducacao: string;
 
+  @IsString()
+  possuiDoutorado: string;
 
+  @IsString()
+  @IsOptional()
+  quantidadeDoutorado: string;
+
+  @IsString()
+  @IsOptional()
+  possuiMestrado: string;
+
+  @IsString()
+  @IsOptional()
+  quantidadeMestrado: string;
+
+  @IsString()
+  @IsOptional()
+  possuiEspecializacao: string;
+
+  @IsString()
+  @IsOptional()
+  quantidadeEspecilizacao: string;
+
+  // 📊 Convertendo número corretamente
+  @Transform(({ value }) => Number(value))
   @IsOptional()
   @IsNumber()
   tempoExperiencia?: number;

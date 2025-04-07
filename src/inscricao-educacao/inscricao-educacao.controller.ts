@@ -2,55 +2,25 @@ import { Controller, Get, Post, Body, Patch, Param, Delete, UploadedFiles, UseIn
 import { InscricaoEducacaoService } from './inscricao-educacao.service';
 import { CreateInscricaoEducacaoDto } from './dto/create-inscricao-educacao.dto';
 import { UpdateInscricaoEducacaoDto } from './dto/update-inscricao-educacao.dto';
-import { FileFieldsInterceptor, FilesInterceptor } from '@nestjs/platform-express';
-import { diskStorage } from 'multer';
-import { extname } from 'path';
+import { FileFieldsInterceptor } from '@nestjs/platform-express';
 
 @Controller('inscricao-educacao')
 export class InscricaoEducacaoController {
   constructor(private readonly inscricaoEducacaoService: InscricaoEducacaoService) { }
 
+
   @Post()
-  @UseInterceptors(
-    FileFieldsInterceptor(
-      [
-        { name: 'ensinoFundamental', maxCount: 1 },
-        { name: 'ensinoMedio', maxCount: 1 },
-        { name: 'ensinoSuperior', maxCount: 1 },
-        { name: 'cursoEducacao', maxCount: 1 },
-        { name: 'doutorado', maxCount: 1 },
-        { name: 'laudoPcd', maxCount: 1 },
-      ],
-      {
-        storage: diskStorage({
-          destination: './uploads', // Diretório onde os arquivos serão armazenados
-          filename: (req, file, callback) => {
-            const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1e9);
-            const ext = extname(file.originalname);
-            callback(null, `${file.fieldname}-${uniqueSuffix}${ext}`);
-          },
-        }),
-      },
-    ),
-  )
+  @UseInterceptors(FileFieldsInterceptor([
+    { name: 'cpfFile', maxCount: 1 },
+    { name: 'comprovanteEndereco', maxCount: 1 },
+    { name: 'comprovanteReservista', maxCount: 1 },
+  ]))
   create(
     @Body() createInscricaoEducacaoDto: CreateInscricaoEducacaoDto,
-    @UploadedFiles()
-    files: {
-      ensinoFundamental?: Express.Multer.File[],
-      ensinoMedio?: Express.Multer.File[],
-      comprovanteEnsinoSuperior?: Express.Multer.File[],
-      ensinoSuperior?: Express.Multer.File[],
-      doutorado?: Express.Multer.File[],
-      laudoPcd?: Express.Multer.File[],
-    }
+    @UploadedFiles() files: { cpfFile?: Express.Multer.File[], comprovanteEndereco?: Express.Multer.File[], comprovanteReservista?: Express.Multer.File[] }
+
   ) {
-
-    const allFiles: Express.Multer.File[] = Object.values(files)
-      .flat()
-      .filter(Boolean);
-
-    return this.inscricaoEducacaoService.create(createInscricaoEducacaoDto, allFiles);
+    return this.inscricaoEducacaoService.create(createInscricaoEducacaoDto, files);
   }
 
   @Get()
