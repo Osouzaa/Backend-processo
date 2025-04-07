@@ -131,7 +131,7 @@ export class FilesService {
 
     files.forEach(async (file, index) => {
       const tipo = tipos[index] || `extra${index}`;
-      const fileName = `Doutorado-${tipo}.pdf`;
+      const fileName = `Curso-educacao-${tipo}.pdf`;
       const filePath = path.join(userDir, fileName);
       const savedFiles: File[] = [];
       fs.writeFileSync(filePath, file.buffer);
