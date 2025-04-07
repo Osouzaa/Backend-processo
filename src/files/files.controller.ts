@@ -43,6 +43,24 @@ export class FilesController {
     return this.fileService.uploadCursoEducacao(createFileDTO, file);
   }
 
+  @Post('upload-mestrado')
+  @UseInterceptors(FilesInterceptor('files', 2))
+  uploadMestrado(
+    @UploadedFiles() files: Express.Multer.File[],
+    @Body() createFileDTO: CreateFileDto
+  ) {
+    return this.fileService.uploadMestrado(createFileDTO, files);
+  }
+
+  @Post('upload-especializacao')
+  @UseInterceptors(FilesInterceptor('files', 2))
+  uploadEspecializacao(
+    @UploadedFiles() files: Express.Multer.File[],
+    @Body() createFileDTO: CreateFileDto
+  ) {
+    return this.fileService.uploadEspecializacao(createFileDTO, files);
+  }
+
 
 
 }

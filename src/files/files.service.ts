@@ -121,4 +121,67 @@ export class FilesService {
     await this.filesRepository.save(newFile);
     return { message: "Arquivo salvo com sucesso!", file: newFile };
   }
+
+  async uploadMestrado(dto: CreateFileDto, files: Express.Multer.File[]) {
+    const inscricao = await this.inscricaoService.findOne(+dto.inscricaoId);
+    if (!inscricao) throw new Error("Inscrição não encontrada!");
+
+    const { userDir, publicPathPrefix } = this.getUserDirInfo(inscricao.nomeCompleto, inscricao.cpf);
+
+    const savedFiles: File[] = [];
+
+    for (const file of files) {
+      const fileSuffix = file.originalname.toLowerCase().includes('verso') ? 'verso' : 'frente';
+      const fileName = `mestrado-${fileSuffix}.pdf`;
+      const filePath = path.join(userDir, fileName);
+
+      fs.writeFileSync(filePath, file.buffer);
+
+      const newFile = this.filesRepository.create({
+        fileName,
+        path: `${publicPathPrefix}/${fileName}`,
+        inscricao: inscricao,
+      });
+
+      const savedFile = await this.filesRepository.save(newFile);
+      savedFiles.push(savedFile);
+    }
+
+    return {
+      message: "Arquivos salvos com sucesso!",
+      files: savedFiles,
+    };
+  }
+
+  async uploadEspecializacao(dto: CreateFileDto, files: Express.Multer.File[]) {
+    const inscricao = await this.inscricaoService.findOne(+dto.inscricaoId);
+    if (!inscricao) throw new Error("Inscrição não encontrada!");
+
+    const { userDir, publicPathPrefix } = this.getUserDirInfo(inscricao.nomeCompleto, inscricao.cpf);
+
+    const tipos = ['frente', 'verso'];
+
+    const savedFiles = [];
+
+    files.forEach(async (file, index) => {
+      const tipo = tipos[index] || `extra${index}`;
+      const fileName = `especializacao-${tipo}.pdf`;
+      const filePath = path.join(userDir, fileName);
+      const savedFiles: File[] = [];
+      fs.writeFileSync(filePath, file.buffer);
+
+      const newFile = this.filesRepository.create({
+        fileName,
+        path: `${publicPathPrefix}/${fileName}`,
+        inscricao: inscricao,
+      });
+
+      const savedFile = await this.filesRepository.save(newFile);
+      savedFiles.push(savedFile);
+    });
+
+    return {
+      message: "Arquivos salvos com sucesso!",
+    };
+  }
 }
