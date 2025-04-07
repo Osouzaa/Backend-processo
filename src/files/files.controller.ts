@@ -8,16 +8,17 @@ export class FilesController {
   constructor(private readonly fileService: FilesService) { }
 
   @Post('ensino-medio')
-  @UseInterceptors(FileInterceptor('ensinoMedioFile'))
+  @UseInterceptors(FilesInterceptor('files', 2))
   uploadEnsinoMedio(
-    @UploadedFile() file: Express.Multer.File,
+    @UploadedFiles() files: Express.Multer.File[],
     @Body() createFileDTO: CreateFileDto
   ) {
-    return this.fileService.create(createFileDTO, file);
+    return this.fileService.create(createFileDTO, files);
   }
 
+
   @Post('graduacao')
-  @UseInterceptors(FilesInterceptor('graduacao', 5))
+  @UseInterceptors(FilesInterceptor('files', 2))
   uploadGraduacao(
     @UploadedFiles() files: Express.Multer.File[],
     @Body() createFileDTO: CreateFileDto
@@ -26,21 +27,21 @@ export class FilesController {
   }
 
   @Post('upload-doutorado')
-  @UseInterceptors(FileInterceptor('file'))
+  @UseInterceptors(FilesInterceptor('files', 2))
   uploadDoutorado(
-    @UploadedFile() file: Express.Multer.File,
+    @UploadedFiles() files: Express.Multer.File[],
     @Body() createFileDTO: CreateFileDto
   ) {
-    return this.fileService.createUploadDoutorado(createFileDTO, file);
+    return this.fileService.createUploadDoutorado(createFileDTO, files);
   }
 
   @Post('cursoEducacao')
-  @UseInterceptors(FileInterceptor('cursoEducacao'))
+  @UseInterceptors(FilesInterceptor('files', 2))
   uploadCursoEducacao(
-    @UploadedFile() file: Express.Multer.File,
+    @UploadedFiles() files: Express.Multer.File[],
     @Body() createFileDTO: CreateFileDto
   ) {
-    return this.fileService.uploadCursoEducacao(createFileDTO, file);
+    return this.fileService.uploadCursoEducacao(createFileDTO, files);
   }
 
   @Post('upload-mestrado')

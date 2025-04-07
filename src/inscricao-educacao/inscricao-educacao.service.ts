@@ -25,7 +25,6 @@ export class InscricaoEducacaoService {
       comprovanteReservista?: Express.Multer.File[];
     }
   ) {
-    console.log(typeof dto.tempoExperiencia)
     const candidate = await this.findByCpf(dto.cpf);
     if (candidate) {
       throw new ConflictException('Candidato já cadastrado!');
