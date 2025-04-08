@@ -16,10 +16,10 @@ export class CandidatoAuthService {
   ) { }
 
   async register(dto: RegisterCandidatoDTO) {
-    const existing = await this.candidatoRepo.findOne({ where: { email: dto.email } });
+    const existing = await this.candidatoRepo.findOne({ where: { cpf: dto.cpf } });
 
     if (existing) {
-      throw new ConflictException('E-mail já cadastrado.');
+      throw new ConflictException('Candidato ja cadastrado!');
     }
 
     const senhaCriptografada = await bcrypt.hash(dto.senha, 10);
@@ -35,7 +35,7 @@ export class CandidatoAuthService {
   }
 
   async login(dto: LoginCandidatoDto) {
-    const candidato = await this.candidatoRepo.findOne({ where: { email: dto.email } });
+    const candidato = await this.candidatoRepo.findOne({ where: { cpf: dto.cpf } });
 
     if (!candidato || !(await bcrypt.compare(dto.senha, candidato.senha_hash))) {
       throw new UnauthorizedException('Credenciais inválidas.');

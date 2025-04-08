@@ -1,8 +1,8 @@
 import { IsEmail, IsString } from 'class-validator';
 
 export class LoginCandidatoDto {
-  @IsEmail()
-  email: string;
+  @IsString()
+  cpf: string;
 
   @IsString()
   senha: string;
