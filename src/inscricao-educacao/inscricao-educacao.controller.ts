@@ -9,12 +9,15 @@ import * as fs from 'fs';
 import * as path from 'path';
 import * as archiver from 'archiver';
 import { AuthGuard } from 'src/auth/auth.guard';
+import { CurrentUser } from 'src/decorators/currentUser.decorator';
+import { AuthGuardCandidates } from 'src/candidates/auth.guard';
 
 @Controller('inscricao-educacao')
 export class InscricaoEducacaoController {
   constructor(private readonly inscricaoEducacaoService: InscricaoEducacaoService) { }
 
 
+  @UseGuards(AuthGuard, AuthGuardCandidates)
   @Post()
   @UseInterceptors(FileFieldsInterceptor([
     { name: 'cpfFile', maxCount: 1 },
@@ -23,11 +26,16 @@ export class InscricaoEducacaoController {
     { name: 'laudoPcd', maxCount: 1 },
   ]))
   create(
+    @CurrentUser() user: CurrentUser,
     @Body() createInscricaoEducacaoDto: CreateInscricaoEducacaoDto,
-    @UploadedFiles() files: { cpfFile?: Express.Multer.File[], comprovanteEndereco?: Express.Multer.File[], comprovanteReservista?: Express.Multer.File[] }
-
+    @UploadedFiles() files: {
+      cpfFile?: Express.Multer.File[],
+      comprovanteEndereco?: Express.Multer.File[],
+      comprovanteReservista?: Express.Multer.File[],
+      laudoPcd?: Express.Multer.File[]
+    }
   ) {
-    return this.inscricaoEducacaoService.create(createInscricaoEducacaoDto, files);
+    return this.inscricaoEducacaoService.create(createInscricaoEducacaoDto, files, user);
   }
 
   @UseGuards(AuthGuard)

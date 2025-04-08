@@ -11,6 +11,7 @@ import { env } from 'src/env';
 import type { QueryInscricaoEducacaoDto } from './dto/query-inscricao-educacao.dto';
 import * as ExcelJs from "exceljs"
 import { Candidato } from 'src/db/entities/candidato.entity';
+import type { CurrentUser } from 'src/decorators/currentUser.decorator';
 @Injectable()
 export class InscricaoEducacaoService {
   private readonly BASE_URL = env.BASE_URL
@@ -30,11 +31,14 @@ export class InscricaoEducacaoService {
       comprovanteEndereco?: Express.Multer.File[];
       comprovanteReservista?: Express.Multer.File[];
       laudoPcd?: Express.Multer.File[];
-    }
+    },
+    user: CurrentUser
   ) {
+
+    console.log('Usuário logado:', user);
     const candidateRegistered = await this.candidatoRepo.findOne({
       where: {
-        id: dto.candidateId
+        id: user.sub
       }
     })
 
