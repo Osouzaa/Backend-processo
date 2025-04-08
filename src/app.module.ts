@@ -5,6 +5,7 @@ import { ServeStaticModule } from '@nestjs/serve-static';
 import { join } from 'path';
 import { InscricaoEducacaoModule } from './inscricao-educacao/inscricao-educacao.module';
 import { FilesModule } from './files/files.module';
+import { CandidatesModule } from './candidates/candidates.module';
 
 @Module({
   imports: [
@@ -15,7 +16,8 @@ import { FilesModule } from './files/files.module';
     ConfigModule.forRoot({ isGlobal: true }),
     DataBaseModule,
     InscricaoEducacaoModule,
-    FilesModule
+    FilesModule,
+    CandidatesModule
   ],
   controllers: [],
   providers: [],
