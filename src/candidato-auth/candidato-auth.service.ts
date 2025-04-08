@@ -26,7 +26,7 @@ export class CandidatoAuthService {
 
     const novoCandidato = this.candidatoRepo.create({
       ...dto,
-      senha: senhaCriptografada,
+      senha_hash: senhaCriptografada,
     });
 
     await this.candidatoRepo.save(novoCandidato);
@@ -37,7 +37,7 @@ export class CandidatoAuthService {
   async login(dto: LoginCandidatoDto) {
     const candidato = await this.candidatoRepo.findOne({ where: { email: dto.email } });
 
-    if (!candidato || !(await bcrypt.compare(dto.senha, candidato.senha))) {
+    if (!candidato || !(await bcrypt.compare(dto.senha, candidato.senha_hash))) {
       throw new UnauthorizedException('Credenciais inválidas.');
     }
 

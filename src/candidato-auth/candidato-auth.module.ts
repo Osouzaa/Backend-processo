@@ -5,13 +5,14 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { Candidato } from 'src/db/entities/candidato.entity';
 import { CandidatoAuthController } from './candidato-auth.controller';
 import { CandidatoAuthService } from './candidato-auth.service';
+import { jwtConstants } from 'src/auth/constants';
 
 @Module({
   imports: [
     TypeOrmModule.forFeature([Candidato]),
     JwtModule.register({
-      secret: 'seuSegredoAqui', // idealmente usar env
-      signOptions: { expiresIn: '1d' },
+      secret: jwtConstants.secret,
+      signOptions: { expiresIn: '15d' },
     }),
   ],
   controllers: [CandidatoAuthController],

@@ -20,13 +20,13 @@ export class Candidato {
   email: string;
 
   @Column()
-  senha: string;
+  celular: string;
 
-  @CreateDateColumn()
-  criadoEm: Date;
+  @Column()
+  cpf: string;
 
-  @UpdateDateColumn()
-  atualizadoEm: Date;
+  @Column()
+  senha_hash: string;
 
   @OneToMany(() => InscricaoEducacao, (inscricao) => inscricao.candidato)
   inscricoesEducacao: InscricaoEducacao[];

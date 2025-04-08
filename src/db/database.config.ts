@@ -4,6 +4,7 @@ import { env } from 'src/env';
 import { InscricaoEducacao } from './entities/inscricoes-educacao.entity';
 import { File } from './entities/file.entity';
 import { Candidato } from './entities/candidato.entity';
+import { User } from './entities/user.entity';
 
 @Module({
   imports: [
@@ -14,7 +15,7 @@ import { Candidato } from './entities/candidato.entity';
       username: env.DB_USERNAME,
       password: env.DB_PASSWORD,
       database: env.DB_NAME,
-      entities: [InscricaoEducacao, File, Candidato],
+      entities: [InscricaoEducacao, File, Candidato, User],
       // ssl: true,
       synchronize: true,
     }),
