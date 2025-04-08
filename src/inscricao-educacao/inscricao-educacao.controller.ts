@@ -5,6 +5,9 @@ import { UpdateInscricaoEducacaoDto } from './dto/update-inscricao-educacao.dto'
 import { FileFieldsInterceptor } from '@nestjs/platform-express';
 import type { QueryInscricaoEducacaoDto } from './dto/query-inscricao-educacao.dto';
 import { Response } from 'express'
+import * as fs from 'fs';
+import * as path from 'path';
+import * as archiver from 'archiver';
 
 @Controller('inscricao-educacao')
 export class InscricaoEducacaoController {
@@ -39,6 +42,47 @@ export class InscricaoEducacaoController {
     res.setHeader('Content-Disposition', 'attachment; filename=inscricao_educacao.xlsx');
 
     return res.send(buffer);
+  }
+
+  @Get('download/:id')
+  async downloadFolder(
+    @Param('id') id: string,
+    @Res() res: Response
+  ) {
+    // Sanitiza o CPF para garantir o padrão
+
+
+    // Procura o candidato pelo CPF
+    const inscricao = await this.inscricaoEducacaoService.findOne(+id);
+
+    const cpfSanitizado = inscricao.cpf.replace(/\D/g, '');
+
+    if (!inscricao) {
+      return res.status(404).json({ message: 'Inscrição não encontrada' });
+    }
+
+    // Sanitiza o nome e cria o nome da pasta
+    const nomeSanitizado = inscricao.nomeCompleto.normalize("NFD")
+      .replace(/[\u0300-\u036f]/g, "")
+      .replace(/\s+/g, "_")
+      .replace(/[^\w\s]/gi, "");
+
+    const folderName = `${nomeSanitizado}_${cpfSanitizado}`;
+    const folderPath = path.join(__dirname, '../../uploads', folderName);
+
+    if (!fs.existsSync(folderPath)) {
+      return res.status(404).json({ message: 'Pasta não encontrada no servidor' });
+    }
+
+    const zipName = `${folderName}.zip`;
+    res.setHeader('Content-Type', 'application/zip');
+    res.setHeader('Content-Disposition', `attachment; filename=${zipName}`);
+
+    const archive = archiver('zip', { zlib: { level: 9 } });
+    archive.directory(folderPath, false);
+    archive.finalize();
+
+    archive.pipe(res);
   }
 
   @Get(':id')
