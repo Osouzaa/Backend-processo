@@ -10,12 +10,17 @@ import { calcularPontuacao } from 'src/utils/calc-pontuacao';
 import { env } from 'src/env';
 import type { QueryInscricaoEducacaoDto } from './dto/query-inscricao-educacao.dto';
 import * as ExcelJs from "exceljs"
+import { Candidato } from 'src/db/entities/candidato.entity';
 @Injectable()
 export class InscricaoEducacaoService {
   private readonly BASE_URL = env.BASE_URL
   constructor(
     @InjectRepository(InscricaoEducacao)
     private readonly inscricaoEducacaoRepository: Repository<InscricaoEducacao>,
+
+    @InjectRepository(Candidato)
+    private readonly candidatoRepo: Repository<Candidato>,
+
   ) { }
 
   async create(
@@ -27,6 +32,16 @@ export class InscricaoEducacaoService {
       laudoPcd?: Express.Multer.File[];
     }
   ) {
+    const candidateRegistered = await this.candidatoRepo.findOne({
+      where: {
+        id: dto.candidateId
+      }
+    })
+
+    if (!candidateRegistered) {
+      throw new ConflictException('Candidato nao cadastrado!');
+    }
+
     const candidate = await this.findByCpf(dto.cpf);
     if (candidate) {
       throw new ConflictException('Candidato já cadastrado!');
@@ -93,6 +108,7 @@ export class InscricaoEducacaoService {
       comprovanteEnderecoLink: savedFiles['comprovanteEndereco'],
       certificadoReservistaLink: savedFiles['comprovanteReservista'],
       laudoPcd: savedFiles['comprovante_laudopcd'],
+      candidato: candidateRegistered,
     });
 
     await this.inscricaoEducacaoRepository.save(novaInscricao);

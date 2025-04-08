@@ -3,6 +3,10 @@ import { IsNotEmpty, IsOptional, IsBoolean, IsString, IsNumber } from 'class-val
 
 export class CreateInscricaoEducacaoDto {
   @IsNotEmpty()
+  candidateId: number
+
+
+  @IsNotEmpty()
   @IsString()
   nomeCompleto: string;
 

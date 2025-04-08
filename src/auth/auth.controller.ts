@@ -1,17 +1,13 @@
 import {
   Body,
   Controller,
-  Get,
   HttpCode,
   HttpStatus,
   Post,
-  Request,
-  UseGuards
 } from '@nestjs/common';
 import { AuthService } from './auth.service';
-import { AuthGuard } from './auth.guard';
-import type { LoginDto } from './dto/login.dto';
-import type { RegisterUserDTO } from './dto/register.dto';
+import { LoginDto } from './dto/login.dto';
+import { RegisterUserDTO } from './dto/register.dto';
 
 interface AuthResponse {
   access_token: string;
