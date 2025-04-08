@@ -41,8 +41,15 @@ export class CandidatesService {
     return `This action returns all candidates`;
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} candidate`;
+  async findOne(id: number) {
+    const candidate = await this.candidatoRepo.findOne({
+      where: {
+        id
+      },
+      relations: ['inscricoesEducacao']
+    })
+
+    return candidate
   }
 
   update(id: number, updateCandidateDto: UpdateCandidateDto) {

@@ -61,6 +61,9 @@ export class InscricaoEducacao {
   @Column()
   naturalidade: string;
 
+  @Column({ nullable: true })
+  cidadeNaturalidade: string;
+
   @Column()
   estadoCivil: string;
 

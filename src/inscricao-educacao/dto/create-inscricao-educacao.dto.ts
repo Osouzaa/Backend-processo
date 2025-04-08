@@ -48,6 +48,10 @@ export class CreateInscricaoEducacaoDto {
 
   @IsNotEmpty()
   @IsString()
+  cidadeNaturalidade: string;
+
+  @IsNotEmpty()
+  @IsString()
   estadoCivil: string;
 
   @IsOptional()
@@ -160,4 +164,9 @@ export class CreateInscricaoEducacaoDto {
   @IsOptional()
   @IsNumber()
   tempoExperiencia?: number;
+
+  @Transform(({ value }) => Number(value))
+  @IsOptional()
+  @IsNumber()
+  totalDeDias?: number;
 }
