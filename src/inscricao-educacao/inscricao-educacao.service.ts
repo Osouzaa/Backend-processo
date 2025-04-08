@@ -9,7 +9,7 @@ import type { UpdateInscricaoEducacaoDto } from './dto/update-inscricao-educacao
 import { calcularPontuacao } from 'src/utils/calc-pontuacao';
 import { env } from 'src/env';
 import type { QueryInscricaoEducacaoDto } from './dto/query-inscricao-educacao.dto';
-
+import * as ExcelJs from "exceljs"
 @Injectable()
 export class InscricaoEducacaoService {
   private readonly BASE_URL = env.BASE_URL
@@ -151,6 +151,97 @@ export class InscricaoEducacaoService {
     } catch (error) {
       console.log("error", error);
     }
+  }
+
+
+  async exportToExcel(): Promise<Uint8Array> {
+    const inscricoes = await this.inscricaoEducacaoRepository.find({ relations: ['files'] });
+
+    const workbook = new ExcelJs.Workbook();
+    const worksheet = workbook.addWorksheet('Inscrições');
+
+    const headers = [
+      'ID', 'Criado em', 'Atualizado em', 'Nome Completo', 'Pontuação', 'Escolaridade', 'Data de Nascimento',
+      'RG', 'CPF', 'Link CPF', 'Gênero', 'Email', 'Certificado Reservista', 'Link Certificado Reservista',
+      'Nacionalidade', 'Naturalidade', 'Estado Civil', 'PCD', 'Laudo PCD', 'Vaga Destinada a PCD',
+      'Cargo/Função', 'Telefone Fixo', 'Celular', 'CEP', 'Logradouro', 'Complemento', 'Número',
+      'Bairro', 'Cidade', 'Estado', 'Comprovante Endereço Link',
+      'Ensino Fundamental', 'Ensino Médio', 'Ensino Superior', 'Qtde Ensino Superior',
+      'Curso Área Educação', 'Qtde Curso Área Educação',
+      'Doutorado', 'Mestrado', 'Especialização', 'Qtde Especialização',
+      'Tempo de Experiência', 'Arquivos',
+    ];
+
+    worksheet.addRow(headers);
+
+    // Congelar o cabeçalho
+    worksheet.views = [{ state: 'frozen', ySplit: 1 }];
+
+    inscricoes.forEach(inscricao => {
+      const arquivos = inscricao.files?.map(file => file.path).join(', ') || 'Nenhum';
+
+      worksheet.addRow([
+        inscricao.id,
+        this.formatDate(inscricao.criadoEm),
+        this.formatDate(inscricao.atualizadoEm),
+        inscricao.nomeCompleto,
+        inscricao.pontuacao ?? '',
+        inscricao.escolaridade ?? '',
+        this.formatDate(inscricao.dataNascimento),
+        inscricao.rg ?? '',
+        inscricao.cpf,
+        inscricao.cpfLink,
+        inscricao.genero,
+        inscricao.email ?? '',
+        inscricao.certificadoReservista ?? '',
+        inscricao.certificadoReservistaLink ?? '',
+        inscricao.nacionalidade,
+        inscricao.naturalidade,
+        inscricao.estadoCivil,
+        inscricao.pcd ?? '',
+        inscricao.laudoPcd ?? '',
+        inscricao.vagaDestinadaAPCD ?? '',
+        inscricao.cargoFuncao,
+        inscricao.contatoTelefoneFixo ?? '',
+        inscricao.contatoCelular ?? '',
+        inscricao.cep,
+        inscricao.logradouro,
+        inscricao.complemento ?? '',
+        inscricao.numero,
+        inscricao.bairro,
+        inscricao.cidade,
+        inscricao.estado,
+        inscricao.comprovanteEnderecoLink,
+        inscricao.possuiEnsinoFundamental ?? '',
+        inscricao.possuiEnsinoMedio ?? '',
+        inscricao.possuiEnsinoSuperior ?? '',
+        inscricao.quantidadeEnsinoSuperior ?? '',
+        inscricao.possuiCursoAreaEducacao ?? '',
+        inscricao.quantidadeCursoAreaEducacao ?? '',
+        inscricao.possuiDoutorado ?? '',
+        inscricao.possuiMestrado ?? '',
+        inscricao.possuiEspecializacao ?? '',
+        inscricao.quantidadeEspecilizacao ?? '',
+        inscricao.tempoExperiencia ?? '',
+        arquivos,
+      ]);
+    });
+
+    worksheet.columns.forEach((column, index) => {
+      // Define largura padrão mais controlada
+      column.width = headers[index].length < 20 ? headers[index].length + 5 : 25;
+      column.alignment = { vertical: 'middle', horizontal: 'left' };
+    });
+
+    const buffer = await workbook.xlsx.writeBuffer();
+    return Buffer.from(buffer);
+  }
+
+  // Formata data como dd/mm/yyyy
+  private formatDate(date: Date | string | null): string {
+    if (!date) return '';
+    const d = new Date(date);
+    return `${String(d.getDate()).padStart(2, '0')}/${String(d.getMonth() + 1).padStart(2, '0')}/${d.getFullYear()}`;
   }
   async findOne(id: number) {
     const inscricao = await this.inscricaoEducacaoRepository.findOne({ where: { id }, relations: ['files'] });
