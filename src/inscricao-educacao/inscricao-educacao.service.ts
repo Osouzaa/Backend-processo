@@ -160,7 +160,10 @@ export class InscricaoEducacaoService {
     const workbook = new ExcelJs.Workbook();
     const worksheet = workbook.addWorksheet('Inscrições');
 
-    const headers = [
+    // Descobrir quantos arquivos no máximo tem entre as inscrições
+    const maxArquivos = Math.max(...inscricoes.map(i => i.files?.length ?? 0));
+
+    const headersBase = [
       'ID', 'Criado em', 'Atualizado em', 'Nome Completo', 'Pontuação', 'Escolaridade', 'Data de Nascimento',
       'RG', 'CPF', 'Link CPF', 'Gênero', 'Email', 'Certificado Reservista', 'Link Certificado Reservista',
       'Nacionalidade', 'Naturalidade', 'Estado Civil', 'PCD', 'Laudo PCD', 'Vaga Destinada a PCD',
@@ -169,8 +172,12 @@ export class InscricaoEducacaoService {
       'Ensino Fundamental', 'Ensino Médio', 'Ensino Superior', 'Qtde Ensino Superior',
       'Curso Área Educação', 'Qtde Curso Área Educação',
       'Doutorado', 'Mestrado', 'Especialização', 'Qtde Especialização',
-      'Tempo de Experiência', 'Arquivos',
+      'Tempo de Experiência',
     ];
+
+    const headersArquivos = Array.from({ length: maxArquivos }, (_, i) => `Arquivo ${i + 1}`);
+
+    const headers = [...headersBase, ...headersArquivos];
 
     worksheet.addRow(headers);
 
@@ -178,9 +185,8 @@ export class InscricaoEducacaoService {
     worksheet.views = [{ state: 'frozen', ySplit: 1 }];
 
     inscricoes.forEach(inscricao => {
-      const arquivos = inscricao.files?.map(file => file.path).join(', ') || 'Nenhum';
-
-      worksheet.addRow([
+      const arquivos = inscricao.files?.map(file => file.path) ?? [];
+      const linha = [
         inscricao.id,
         this.formatDate(inscricao.criadoEm),
         this.formatDate(inscricao.atualizadoEm),
@@ -223,12 +229,13 @@ export class InscricaoEducacaoService {
         inscricao.possuiEspecializacao ?? '',
         inscricao.quantidadeEspecilizacao ?? '',
         inscricao.tempoExperiencia ?? '',
-        arquivos,
-      ]);
+        ...arquivos,
+      ];
+
+      worksheet.addRow(linha);
     });
 
     worksheet.columns.forEach((column, index) => {
-      // Define largura padrão mais controlada
       column.width = headers[index].length < 20 ? headers[index].length + 5 : 25;
       column.alignment = { vertical: 'middle', horizontal: 'left' };
     });
@@ -237,7 +244,6 @@ export class InscricaoEducacaoService {
     return Buffer.from(buffer);
   }
 
-  // Formata data como dd/mm/yyyy
   private formatDate(date: Date | string | null): string {
     if (!date) return '';
     const d = new Date(date);

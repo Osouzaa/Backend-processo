@@ -14,6 +14,11 @@ async function bootstrap() {
     origin: '*',  // Permite todos os domínios
   });
 
+  app.use((req, res, next) => {
+    res.setHeader('Content-Security-Policy', "frame-ancestors *");
+    next();
+  });
+
   app.use('/upload', express.static(join(__dirname, '..', 'uploads')));
   await app.listen(env.PORT || 3000);
 }
