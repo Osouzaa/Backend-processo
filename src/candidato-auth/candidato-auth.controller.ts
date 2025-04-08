@@ -6,8 +6,8 @@ import {
   HttpStatus,
 } from '@nestjs/common';
 import { CandidatoAuthService } from './candidato-auth.service';
-import type { LoginCandidatoDto } from './dto/login-candidato.dto';
-import type { RegisterCandidatoDTO } from './dto/register-candidato.dto';
+import { LoginCandidatoDto } from './dto/login-candidato.dto';
+import { RegisterCandidatoDTO } from './dto/register-candidato.dto';
 
 @Controller('auth/candidato')
 export class CandidatoAuthController {

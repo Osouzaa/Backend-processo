@@ -9,4 +9,10 @@ export class RegisterCandidatoDTO {
 
   @IsString()
   senha: string;
+
+  @IsString()
+  celular: string;
+
+  @IsString()
+  cpf: string;
 }
