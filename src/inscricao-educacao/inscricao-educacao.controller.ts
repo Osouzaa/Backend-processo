@@ -1,8 +1,9 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, UploadedFiles, UseInterceptors } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, UploadedFiles, UseInterceptors, Query } from '@nestjs/common';
 import { InscricaoEducacaoService } from './inscricao-educacao.service';
 import { CreateInscricaoEducacaoDto } from './dto/create-inscricao-educacao.dto';
 import { UpdateInscricaoEducacaoDto } from './dto/update-inscricao-educacao.dto';
 import { FileFieldsInterceptor } from '@nestjs/platform-express';
+import type { QueryInscricaoEducacaoDto } from './dto/query-inscricao-educacao.dto';
 
 @Controller('inscricao-educacao')
 export class InscricaoEducacaoController {
@@ -25,8 +26,8 @@ export class InscricaoEducacaoController {
   }
 
   @Get()
-  findAll() {
-    return this.inscricaoEducacaoService.findAll();
+  findAll(@Query() query: QueryInscricaoEducacaoDto & { page?: number }) {
+    return this.inscricaoEducacaoService.findAll(query);
   }
 
   @Get(':id')

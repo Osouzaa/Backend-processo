@@ -8,6 +8,7 @@ import type { CreateInscricaoEducacaoDto } from './dto/create-inscricao-educacao
 import type { UpdateInscricaoEducacaoDto } from './dto/update-inscricao-educacao.dto';
 import { calcularPontuacao } from 'src/utils/calc-pontuacao';
 import { env } from 'src/env';
+import type { QueryInscricaoEducacaoDto } from './dto/query-inscricao-educacao.dto';
 
 @Injectable()
 export class InscricaoEducacaoService {
@@ -105,11 +106,52 @@ export class InscricaoEducacaoService {
   async findByCpf(cpf: string) {
     return this.inscricaoEducacaoRepository.findOne({ where: { cpf } });
   }
+  async findAll(query: QueryInscricaoEducacaoDto & { page?: number }) {
+    try {
+      const { cpf, escolaridade, cargoFuncao, nomeCompleto, page = 1 } = query;
 
-  async findAll() {
-    return this.inscricaoEducacaoRepository.find();
+      const qb = this.inscricaoEducacaoRepository.createQueryBuilder('inscricao');
+
+      if (cpf) {
+        qb.andWhere(
+          "REPLACE(REPLACE(REPLACE(inscricao.cpf, '.', ''), '-', ''), ' ', '') = :cpf",
+          { cpf: cpf.replace(/\D/g, '') }
+        );
+      }
+
+      if (escolaridade) {
+        qb.andWhere('inscricao.escolaridade = :escolaridade', { escolaridade });
+      }
+
+      if (cargoFuncao) {
+        qb.andWhere('inscricao.cargoFuncao = :cargoFuncao', { cargoFuncao });
+      }
+
+      if (nomeCompleto) {
+        qb.andWhere('LOWER(inscricao.nomeCompleto) LIKE LOWER(:nomeCompleto)', {
+          nomeCompleto: `%${nomeCompleto}%`,
+        });
+      }
+
+      const take = 20;
+      const skip = (page - 1) * take;
+
+      const [data, total] = await qb
+        .orderBy('inscricao.pontuacao', 'DESC')
+        .skip(skip)
+        .take(take)
+        .getManyAndCount();
+
+      return {
+        data,
+        total,
+        page,
+        pageCount: Math.ceil(total / take),
+      };
+    } catch (error) {
+      console.log("error", error);
+    }
   }
-
   async findOne(id: number) {
     const inscricao = await this.inscricaoEducacaoRepository.findOne({ where: { id }, relations: ['files'] });
 

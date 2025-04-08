@@ -30,6 +30,10 @@ export class CreateInscricaoEducacaoDto {
   @IsString()
   genero: string;
 
+  @IsNotEmpty()
+  @IsString()
+  email: string;
+
   @IsOptional()
   @IsString()
   certificadoReservista?: string;

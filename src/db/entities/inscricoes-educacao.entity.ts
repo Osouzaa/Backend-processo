@@ -45,6 +45,10 @@ export class InscricaoEducacao {
   @Column()
   genero: string;
 
+
+  @Column({ nullable: true })
+  email: string;
+
   @Column({ nullable: true })
   certificadoReservista: string;
 
