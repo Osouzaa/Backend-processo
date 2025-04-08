@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, UploadedFiles, UseInterceptors, Query, Res } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, UploadedFiles, UseInterceptors, Query, Res, UseGuards } from '@nestjs/common';
 import { InscricaoEducacaoService } from './inscricao-educacao.service';
 import { CreateInscricaoEducacaoDto } from './dto/create-inscricao-educacao.dto';
 import { UpdateInscricaoEducacaoDto } from './dto/update-inscricao-educacao.dto';
@@ -8,6 +8,7 @@ import { Response } from 'express'
 import * as fs from 'fs';
 import * as path from 'path';
 import * as archiver from 'archiver';
+import { AuthGuard } from 'src/auth/auth.guard';
 
 @Controller('inscricao-educacao')
 export class InscricaoEducacaoController {
@@ -29,11 +30,13 @@ export class InscricaoEducacaoController {
     return this.inscricaoEducacaoService.create(createInscricaoEducacaoDto, files);
   }
 
+  @UseGuards(AuthGuard)
   @Get()
   findAll(@Query() query: QueryInscricaoEducacaoDto & { page?: number }) {
     return this.inscricaoEducacaoService.findAll(query);
   }
 
+  @UseGuards(AuthGuard)
   @Get('export')
   async exportToExel(@Res() res: Response) {
     const buffer = await this.inscricaoEducacaoService.exportToExcel();

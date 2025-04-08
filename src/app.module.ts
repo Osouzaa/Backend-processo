@@ -6,6 +6,9 @@ import { join } from 'path';
 import { InscricaoEducacaoModule } from './inscricao-educacao/inscricao-educacao.module';
 import { FilesModule } from './files/files.module';
 import { CandidatesModule } from './candidates/candidates.module';
+import { AuthModule } from './auth/auth.module';
+import { UserModule } from './user/user.module';
+import { CandidatoAuthModule } from './candidato-auth/candidato-auth.module';
 
 @Module({
   imports: [
@@ -17,7 +20,10 @@ import { CandidatesModule } from './candidates/candidates.module';
     DataBaseModule,
     InscricaoEducacaoModule,
     FilesModule,
-    CandidatesModule
+    CandidatesModule,
+    AuthModule,
+    UserModule,
+    CandidatoAuthModule
   ],
   controllers: [],
   providers: [],

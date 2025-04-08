@@ -12,11 +12,12 @@ import { UserModule } from 'src/user/user.module';
     JwtModule.register({
       global: true,
       secret: jwtConstants.secret,
-      signOptions: { expiresIn: '15d' }, // Expiração em 15 dias
+      signOptions: { expiresIn: '15d' },
     }),
   ],
   providers: [AuthService],
   controllers: [AuthController],
-  exports: [AuthService],
+  exports: [AuthService, JwtModule], // 👈 Adiciona aqui
 })
 export class AuthModule { }
+
