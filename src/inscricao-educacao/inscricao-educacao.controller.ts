@@ -10,7 +10,7 @@ import * as path from 'path';
 import * as archiver from 'archiver';
 import { AuthGuard } from 'src/auth/auth.guard';
 import { CurrentUser } from 'src/decorators/currentUser.decorator';
-import { AuthGuardCandidates } from 'src/candidates/auth.guard';
+import { AuthGuardCandidates } from 'src/candidato-auth/auth.guard';
 
 @Controller('inscricao-educacao')
 export class InscricaoEducacaoController {
