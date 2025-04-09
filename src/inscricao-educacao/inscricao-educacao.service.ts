@@ -31,6 +31,7 @@ export class InscricaoEducacaoService {
       comprovanteEndereco?: Express.Multer.File[];
       comprovanteReservista?: Express.Multer.File[];
       laudoPcd?: Express.Multer.File[];
+      comprovanteExperiencia?: Express.Multer.File[];
     },
     user: CurrentUser
   ) {
@@ -101,7 +102,13 @@ export class InscricaoEducacaoService {
 
       savedFiles['comprovante_laudopcd'] = `${this.BASE_URL}/${userFolder}/${fileName}`;
     }
+    if (files.comprovanteExperiencia?.length) {
+      const fileName = 'comprovante_experiencia.pdf';
+      const filePath = path.join(userDir, fileName);
+      fs.writeFileSync(filePath, files.comprovanteExperiencia[0].buffer);
 
+      savedFiles['comprovanteExperiencia'] = `${this.BASE_URL}/${userFolder}/${fileName}`;
+    }
 
     const pontuacaoCalculada = calcularPontuacao(dto);
 
@@ -112,6 +119,7 @@ export class InscricaoEducacaoService {
       comprovanteEnderecoLink: savedFiles['comprovanteEndereco'],
       certificadoReservistaLink: savedFiles['comprovanteReservista'],
       laudoPcd: savedFiles['comprovante_laudopcd'],
+      comprovanteExperienciaLink: savedFiles['comprovanteExperiencia'],
       candidato: candidateRegistered,
     });
 

@@ -155,6 +155,9 @@ export class InscricaoEducacao {
   @Column({ nullable: true })
   totalDeDias: number;
 
+  @Column({ nullable: true })
+  comprovanteExperienciaLink: string;
+
   @ManyToOne(() => Candidato, (candidato) => candidato.inscricoesEducacao, { eager: true })
   candidato: Candidato;
 

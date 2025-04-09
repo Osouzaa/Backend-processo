@@ -24,6 +24,7 @@ export class InscricaoEducacaoController {
     { name: 'comprovanteEndereco', maxCount: 1 },
     { name: 'comprovanteReservista', maxCount: 1 },
     { name: 'laudoPcd', maxCount: 1 },
+    { name: 'comprovanteExperiencia', maxCount: 1 },
   ]))
   create(
     @CurrentUser() user: CurrentUser,
