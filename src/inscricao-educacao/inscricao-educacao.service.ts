@@ -46,10 +46,10 @@ export class InscricaoEducacaoService {
       throw new ConflictException('Candidato nao cadastrado!');
     }
 
-    const candidate = await this.findByCpf(dto.cpf);
-    if (candidate) {
-      throw new ConflictException('Candidato já cadastrado!');
-    }
+    // const candidate = await this.findByCpf(dto.cpf);
+    // // if (candidate) {
+    // //   throw new ConflictException('Candidato já cadastrado!');
+    // // }
 
     // Função de sanitização
     function sanitize(str: string): string {
