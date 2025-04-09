@@ -46,9 +46,13 @@ export class CreateInscricaoEducacaoDto {
   @IsString()
   naturalidade: string;
 
-  @IsNotEmpty()
+  @IsOptional()
   @IsString()
   cidadeNaturalidade: string;
+
+  @IsOptional()
+  @IsString()
+  naturalEstragerio: string
 
   @IsNotEmpty()
   @IsString()

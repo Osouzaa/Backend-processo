@@ -1,20 +1,35 @@
-import type { CreateInscricaoEducacaoDto } from "src/inscricao-educacao/dto/create-inscricao-educacao.dto";
+import { CreateInscricaoEducacaoDto } from "src/inscricao-educacao/dto/create-inscricao-educacao.dto";
 
 export function calcularPontuacao(dto: CreateInscricaoEducacaoDto): number {
   let pontuacao = 0;
+
+  // Função base para calcular pontuação por dias de experiência
+  const calcularPontuacaoExperiencia = (dias: number, isSuperior: boolean = false): number => {
+    let pontos = 0;
+
+    if (dias <= 180) pontos = 10;
+    else if (dias <= 365) pontos = 20;
+    else if (dias <= 730) pontos = 30;
+    else if (dias <= 1095) pontos = 40;
+    else pontos = 50;
+
+    return isSuperior ? Math.floor(pontos / 2) : pontos;
+  };
+
+  const diasExperiencia = Number(dto.tempoExperiencia);
 
   if (dto.escolaridade === "Fundamental") {
     if (dto.possuiEnsinoMedio) pontuacao += 10;
     if (dto.possuiEnsinoSuperior) pontuacao += 10;
 
-    pontuacao += Number(dto.tempoExperiencia) * 10;
+    pontuacao += calcularPontuacaoExperiencia(diasExperiencia);
   }
 
   if (dto.escolaridade === "Médio") {
     if (dto.possuiEnsinoSuperior) pontuacao += 10;
     if (dto.possuiCursoAreaEducacao) pontuacao += 10;
 
-    pontuacao += Number(dto.tempoExperiencia) * 10;
+    pontuacao += calcularPontuacaoExperiencia(diasExperiencia);
   }
 
   if (dto.escolaridade === "Superior") {
@@ -24,17 +39,11 @@ export function calcularPontuacao(dto: CreateInscricaoEducacaoDto): number {
     const qtdEspecializacoes = Number(dto.quantidadeEspecilizacao);
     if (dto.possuiEspecializacao) {
       if (qtdEspecializacoes === 1) pontuacao += 5;
-      if (qtdEspecializacoes === 2) pontuacao += 10;
-      if (qtdEspecializacoes === 3) pontuacao += 15;
+      else if (qtdEspecializacoes === 2) pontuacao += 10;
+      else if (qtdEspecializacoes >= 3) pontuacao += 15;
     }
 
-    switch (Number(dto.tempoExperiencia)) {
-      case 1: pontuacao += 5; break;
-      case 2: pontuacao += 10; break;
-      case 3: pontuacao += 15; break;
-      case 4: pontuacao += 20; break;
-      case 5: pontuacao += 25; break;
-    }
+    pontuacao += calcularPontuacaoExperiencia(diasExperiencia, true); // metade da pontuação
   }
 
   return pontuacao;
