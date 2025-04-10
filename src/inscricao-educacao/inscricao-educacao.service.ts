@@ -13,6 +13,7 @@ import * as ExcelJs from "exceljs"
 import { Candidato } from 'src/db/entities/candidato.entity';
 import type { CurrentUser } from 'src/decorators/currentUser.decorator';
 import type { UpdateScoreDto } from './dto/update-score.dto';
+import { calcularPontosEducacao } from 'src/utils/calcularPontosEducacao';
 @Injectable()
 export class InscricaoEducacaoService {
   private readonly BASE_URL = env.BASE_URL
@@ -103,14 +104,6 @@ export class InscricaoEducacaoService {
 
       savedFiles['comprovante_laudopcd'] = `${this.BASE_URL}/${userFolder}/${fileName}`;
     }
-    if (files.comprovanteExperiencia?.length) {
-      const fileName = 'comprovante_experiencia.pdf';
-      const filePath = path.join(userDir, fileName);
-      fs.writeFileSync(filePath, files.comprovanteExperiencia[0].buffer);
-
-      savedFiles['comprovanteExperiencia'] = `${this.BASE_URL}/${userFolder}/${fileName}`;
-    }
-
     const pontuacaoCalculada = calcularPontuacao(dto);
 
     const novaInscricao = this.inscricaoEducacaoRepository.create({
@@ -120,7 +113,6 @@ export class InscricaoEducacaoService {
       comprovanteEnderecoLink: savedFiles['comprovanteEndereco'],
       certificadoReservistaLink: savedFiles['comprovanteReservista'],
       laudoPcd: savedFiles['comprovante_laudopcd'],
-      comprovanteExperienciaLink: savedFiles['comprovanteExperiencia'],
       candidato: candidateRegistered,
     });
 
@@ -150,7 +142,7 @@ export class InscricaoEducacaoService {
 
       const qb = this.inscricaoEducacaoRepository.createQueryBuilder('inscricao');
 
-      // Filtros
+      // 🔍 Filtros de pesquisa
       if (cpf) {
         qb.andWhere(
           "REPLACE(REPLACE(REPLACE(inscricao.cpf, '.', ''), '-', ''), ' ', '') = :cpf",
@@ -165,10 +157,13 @@ export class InscricaoEducacaoService {
       if (cargoFuncao) {
         qb.andWhere('inscricao.cargoFuncao = :cargoFuncao', { cargoFuncao });
 
-        // Ordenação com critérios de desempate
+        // 🧠 Ordenação com critérios de desempate
         qb.addOrderBy('inscricao.pontuacao', 'DESC')
           .addOrderBy(
-            `CASE WHEN EXTRACT(YEAR FROM AGE(CURRENT_DATE, TO_DATE(inscricao.dataNascimento, 'YYYY-MM-DD'))) >= 60 THEN 1 ELSE 2 END`,
+            `CASE 
+              WHEN EXTRACT(YEAR FROM AGE(CURRENT_DATE, TO_DATE(inscricao.dataNascimento, 'YYYY-MM-DD'))) >= 60 
+              THEN 1 ELSE 2 
+            END`,
             'ASC'
           )
           .addOrderBy('inscricao.totalDeDias', 'DESC')
@@ -184,13 +179,15 @@ export class InscricaoEducacaoService {
         });
       }
 
+      // Paginação
       qb.skip(skip).take(take);
 
+      // 🔄 Busca dados paginados
       const [data, total] = await qb.getManyAndCount();
 
+      // 📊 Classificações
       let classificacoes: Record<number, number> = {};
 
-      // Se for filtrado por cargo, calcula a classificação
       if (cargoFuncao) {
         const classificacaoQuery = this.inscricaoEducacaoRepository
           .createQueryBuilder('inscricao')
@@ -200,6 +197,11 @@ export class InscricaoEducacaoService {
             'inscricao.pontuacao',
             'inscricao.dataNascimento',
             'inscricao.totalDeDias',
+            'inscricao.possuiEnsinoFundamental',
+            'inscricao.possuiEnsinoMedio',
+            'inscricao.possuiEnsinoSuperior',
+            'inscricao.escolaridade',
+            'inscricao.quantidadeEspecilizacao',
           ])
           .addSelect(
             `EXTRACT(YEAR FROM AGE(CURRENT_DATE, TO_DATE(inscricao.dataNascimento, 'YYYY-MM-DD')))`,
@@ -209,55 +211,67 @@ export class InscricaoEducacaoService {
 
         const rawResult = await classificacaoQuery.getRawMany();
 
-        // Ordena com os critérios definidos
-        const ordenadoComEducacao = rawResult
+        const ordenado = rawResult
           .map((item) => {
             const idade = parseInt(item.idade);
             const pontuacao = Number(item.inscricao_pontuacao);
             const totalDeDias = Number(item.inscricao_totalDeDias);
+            const dadosEducacao = {
+              possuiEnsinoMedio: item.inscricao_possuiEnsinoMedio,
+              possuiEnsinoSuperior: item.inscricao_possuiEnsinoSuperior,
+              possuiCursoAreaEducacao: item.inscricao_possuiCursoAreaEducacao,
+              possuiEspecializacao: item.inscricao_possuiEspecializacao,
+              possuiMestrado: item.inscricao_possuiMestrado,
+              possuiDoutorado: item.inscricao_possuiDoutorado,
+              quantidadeEspecilizacao: item.inscricao.quantidadeEspecilizacao,
+            };
+
+            const pontosEducacao = calcularPontosEducacao(dadosEducacao, escolaridade);
 
             return {
               ...item,
               idade,
               pontuacao,
               totalDeDias,
+              pontosEducacao,
             };
           })
           .sort((a, b) => {
-            // 1. Maior pontuação
             if (b.pontuacao !== a.pontuacao) return b.pontuacao - a.pontuacao;
 
-            // 2. Prioridade para idosos
             const isAIdoso = a.idade >= 60;
             const isBIdoso = b.idade >= 60;
             if (isAIdoso !== isBIdoso) return isAIdoso ? -1 : 1;
 
-            // 3. Maior pontuação de educação
             if (b.pontosEducacao !== a.pontosEducacao) return b.pontosEducacao - a.pontosEducacao;
 
-            // 4. Maior total de dias
             if (b.totalDeDias !== a.totalDeDias) return b.totalDeDias - a.totalDeDias;
 
-            // 5. Maior idade
             return b.idade - a.idade;
           });
 
-        // Atribui classificação
-        classificacoes = ordenadoComEducacao.reduce((acc, row, index) => {
+        classificacoes = ordenado.reduce((acc, row, index) => {
           acc[row.inscricao_id] = index + 1;
           return acc;
         }, {});
       }
 
-      // Aplica classificação e pontos de educação na resposta final
+      // 🔁 Monta resultado com classificação e pontos de educação
       const dataComClassificacao = data.map((item) => ({
         ...item,
+        pontosEducacao: calcularPontosEducacao(item),
         classificacao: classificacoes[item.id] || null,
-        // pontosEducacao: calcularPontosEducacao(item),
       }));
 
+      // ✅ Ordenar por classificação (exibido corretamente no frontend)
+      const dataOrdenadaPorClassificacao = dataComClassificacao.sort((a, b) => {
+        if (a.classificacao === null) return 1;
+        if (b.classificacao === null) return -1;
+        return a.classificacao - b.classificacao;
+      });
+
       return {
-        data: dataComClassificacao,
+        data: dataOrdenadaPorClassificacao,
         total,
         page,
         pageCount: Math.ceil(total / take),
@@ -267,6 +281,7 @@ export class InscricaoEducacaoService {
       throw new Error('Erro ao buscar inscrições.');
     }
   }
+
 
 
 
