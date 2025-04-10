@@ -1,10 +1,12 @@
-import { ConflictException, Injectable } from '@nestjs/common';
+import { ConflictException, Injectable, NotFoundException } from '@nestjs/common';
 import { CreateCandidateDto } from './dto/create-candidate.dto';
 import { UpdateCandidateDto } from './dto/update-candidate.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Candidato } from 'src/db/entities/candidato.entity';
 import type { Repository } from 'typeorm';
 import type { CurrentUser } from 'src/decorators/currentUser.decorator';
+import * as bcrypt from 'bcryptjs';
+import type { RecoveryPasswordDto } from './dto/recovery-password.dto';
 
 @Injectable()
 export class CandidatesService {
@@ -71,20 +73,42 @@ export class CandidatesService {
   }
 
   async findByCpfNivel(cpf: string) {
-    const candidate = await this.candidatoRepo
-      .createQueryBuilder('candidato')
-      .leftJoin('candidato.inscricoesEducacao', 'inscricao')
-      .where('candidato.cpf = :cpf', { cpf })
-      .select([
-        'candidato.id',
-        'candidato.nome',
-        'inscricao.id',
-        'inscricao.escolaridade'
-      ])
-      .getOne();
-    console.log(candidate)
+    const candidate = await this.candidatoRepo.findOne({
+      where: {
+        cpf
+      }
+    })
+
+    if (!candidate) {
+      throw new NotFoundException('Candidato nao encontrado');
+    }
+
+
     return candidate;
   }
+
+
+  async recoveryPassword(id: number, newPassword: RecoveryPasswordDto) {
+    const candidate = await this.findOne(id);
+    console.log(candidate)
+    console.log('Tipo de newPassword:', typeof newPassword);
+    console.log('Valor de newPassword:', newPassword);
+
+    if (!candidate) {
+      throw new NotFoundException('Candidato não encontrado');
+    }
+
+    const passwordHash = await bcrypt.hash(newPassword.newPassword, 8);
+
+    candidate.senha_hash = passwordHash;
+
+    await this.candidatoRepo.save(candidate);
+    console.log('Senha atualizada:', candidate.senha_hash);
+
+    await this.candidatoRepo.save(candidate);
+  }
+
+
   update(id: number, updateCandidateDto: UpdateCandidateDto) {
     return `This action updates a #${id} candidate`;
   }

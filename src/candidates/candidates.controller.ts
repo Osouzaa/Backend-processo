@@ -13,6 +13,7 @@ import { CandidatesService } from './candidates.service';
 import { CreateCandidateDto } from './dto/create-candidate.dto';
 import { UpdateCandidateDto } from './dto/update-candidate.dto';
 import { AuthGuardCandidates } from 'src/candidato-auth/auth.guard';
+import type { RecoveryPasswordDto } from './dto/recovery-password.dto';
 
 @Controller('candidates')
 export class CandidatesController {
@@ -43,6 +44,14 @@ export class CandidatesController {
   findOne(@Param('id') id: string) {
     return this.candidatesService.findOne(+id);
   }
+
+  @Patch('recoveryPassword/:id')
+  recoveryPassword(@Param('id') id: string,
+    @Body() newPassword: RecoveryPasswordDto
+  ) {
+    return this.candidatesService.recoveryPassword(+id, newPassword);
+  }
+
 
   @Patch(':id')
   update(

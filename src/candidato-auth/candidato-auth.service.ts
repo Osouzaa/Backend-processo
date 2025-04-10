@@ -22,7 +22,7 @@ export class CandidatoAuthService {
       throw new ConflictException('Candidato ja cadastrado!');
     }
 
-    const senhaCriptografada = await bcrypt.hash(dto.senha, 10);
+    const senhaCriptografada = await bcrypt.hash(dto.senha, 8);
 
     const novoCandidato = this.candidatoRepo.create({
       ...dto,
@@ -37,8 +37,18 @@ export class CandidatoAuthService {
   async login(dto: LoginCandidatoDto) {
     const candidato = await this.candidatoRepo.findOne({ where: { cpf: dto.cpf } });
 
-    if (!candidato || !(await bcrypt.compare(dto.senha, candidato.senha_hash))) {
-      throw new UnauthorizedException('Credenciais inválidas.');
+    console.log(candidato)
+
+    if (!candidato) {
+      throw new UnauthorizedException('Credenciais Invalidas');
+    }
+
+    const senhaCorreta = await bcrypt.compare(dto.senha, candidato.senha_hash);
+
+    console.log("Senha Correta:", senhaCorreta);
+
+    if (!senhaCorreta) {
+      throw new UnauthorizedException('Credenciais Invalidas');
     }
 
     const payload = {
