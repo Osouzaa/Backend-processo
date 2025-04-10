@@ -1,4 +1,4 @@
-import { Injectable, ConflictException } from '@nestjs/common';
+import { Injectable, ConflictException, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import * as fs from 'fs';
@@ -12,6 +12,7 @@ import type { QueryInscricaoEducacaoDto } from './dto/query-inscricao-educacao.d
 import * as ExcelJs from "exceljs"
 import { Candidato } from 'src/db/entities/candidato.entity';
 import type { CurrentUser } from 'src/decorators/currentUser.decorator';
+import type { UpdateScoreDto } from './dto/update-score.dto';
 @Injectable()
 export class InscricaoEducacaoService {
   private readonly BASE_URL = env.BASE_URL
@@ -285,6 +286,22 @@ export class InscricaoEducacaoService {
     }
 
     return inscricao;
+  }
+
+  async updateScore(id: number, dto: UpdateScoreDto) {
+    const candidate = await this.findOne(id);
+
+    if (!candidate) {
+      throw new NotFoundException('Candidato nao encontrado');
+    }
+
+    if (dto.daysUpdated) {
+      candidate.totalDeDias = dto.daysUpdated
+    }
+
+    candidate.pontuacao = dto.pontucaoAtual
+
+    await this.inscricaoEducacaoRepository.save(candidate)
   }
 
   update(id: number, updateInscricaoEducacaoDto: UpdateInscricaoEducacaoDto) {

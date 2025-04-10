@@ -7,6 +7,7 @@ import type { Repository } from 'typeorm';
 import type { CurrentUser } from 'src/decorators/currentUser.decorator';
 import * as bcrypt from 'bcryptjs';
 import type { RecoveryPasswordDto } from './dto/recovery-password.dto';
+import type { UpdateScoreDto } from '../inscricao-educacao/dto/update-score.dto';
 
 @Injectable()
 export class CandidatesService {
@@ -82,8 +83,6 @@ export class CandidatesService {
     if (!candidate) {
       throw new NotFoundException('Candidato nao encontrado');
     }
-
-
     return candidate;
   }
 
@@ -107,7 +106,6 @@ export class CandidatesService {
 
     await this.candidatoRepo.save(candidate);
   }
-
 
   update(id: number, updateCandidateDto: UpdateCandidateDto) {
     return `This action updates a #${id} candidate`;

@@ -14,6 +14,7 @@ import { CreateCandidateDto } from './dto/create-candidate.dto';
 import { UpdateCandidateDto } from './dto/update-candidate.dto';
 import { AuthGuardCandidates } from 'src/candidato-auth/auth.guard';
 import type { RecoveryPasswordDto } from './dto/recovery-password.dto';
+import type { UpdateScoreDto } from '../inscricao-educacao/dto/update-score.dto';
 
 @Controller('candidates')
 export class CandidatesController {
@@ -51,6 +52,7 @@ export class CandidatesController {
   ) {
     return this.candidatesService.recoveryPassword(+id, newPassword);
   }
+
 
 
   @Patch(':id')

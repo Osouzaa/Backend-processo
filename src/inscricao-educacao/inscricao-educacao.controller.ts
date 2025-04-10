@@ -11,6 +11,7 @@ import * as archiver from 'archiver';
 import { AuthGuard } from 'src/auth/auth.guard';
 import { CurrentUser } from 'src/decorators/currentUser.decorator';
 import { AuthGuardCandidates } from 'src/candidato-auth/auth.guard';
+import type { UpdateScoreDto } from './dto/update-score.dto';
 
 @Controller('inscricao-educacao')
 export class InscricaoEducacaoController {
@@ -101,6 +102,14 @@ export class InscricaoEducacaoController {
   findOne(@Param('id') id: string) {
     return this.inscricaoEducacaoService.findOne(+id);
   }
+
+  @Patch('updatedScore/:id')
+  updateScore(@Param('id') id: string,
+    @Body() body: UpdateScoreDto
+  ) {
+    return this.inscricaoEducacaoService.updateScore(+id, body);
+  }
+
 
   @Patch(':id')
   update(@Param('id') id: string, @Body() updateInscricaoEducacaoDto: UpdateInscricaoEducacaoDto) {
