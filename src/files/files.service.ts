@@ -209,4 +209,35 @@ export class FilesService {
       message: "Arquivos salvos com sucesso!",
     };
   }
+
+  async uploadExperienciasProfissionais(dto: CreateFileDto, files: Express.Multer.File[]) {
+    const inscricao = await this.inscricaoService.findOne(+dto.inscricaoId);
+    if (!inscricao) throw new Error("Inscrição não encontrada!");
+
+    const { userDir, publicPathPrefix } = this.getUserDirInfo(inscricao.nomeCompleto, inscricao.cpf);
+
+    const savedFiles: File[] = [];
+
+    for (let i = 0; i < files.length; i++) {
+      const file = files[i];
+      const fileName = `experiencia-${i + 1}.pdf`;
+      const filePath = path.join(userDir, fileName);
+
+      fs.writeFileSync(filePath, file.buffer);
+
+      const newFile = this.filesRepository.create({
+        fileName,
+        path: `${publicPathPrefix}/${fileName}`,
+        inscricao: inscricao,
+      });
+
+      const savedFile = await this.filesRepository.save(newFile);
+      savedFiles.push(savedFile);
+    }
+
+    return {
+      message: "Comprovantes de experiência salvos com sucesso!",
+      files: savedFiles,
+    };
+  }
 }

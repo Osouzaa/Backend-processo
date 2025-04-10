@@ -62,6 +62,15 @@ export class FilesController {
     return this.fileService.uploadEspecializacao(createFileDTO, files);
   }
 
+  @Post('upload-experiencias')
+  @UseInterceptors(FilesInterceptor('files')) // sem limite de arquivos
+  uploadExperiencias(
+    @UploadedFiles() files: Express.Multer.File[],
+    @Body() createFileDTO: CreateFileDto
+  ) {
+    return this.fileService.uploadExperienciasProfissionais(createFileDTO, files);
+  }
+
 
 
 }
