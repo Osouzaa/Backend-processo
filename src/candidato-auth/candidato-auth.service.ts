@@ -37,15 +37,11 @@ export class CandidatoAuthService {
   async login(dto: LoginCandidatoDto) {
     const candidato = await this.candidatoRepo.findOne({ where: { cpf: dto.cpf } });
 
-    console.log(candidato)
-
     if (!candidato) {
       throw new UnauthorizedException('Credenciais Invalidas');
     }
 
     const senhaCorreta = await bcrypt.compare(dto.senha, candidato.senha_hash);
-
-    console.log("Senha Correta:", senhaCorreta);
 
     if (!senhaCorreta) {
       throw new UnauthorizedException('Credenciais Invalidas');

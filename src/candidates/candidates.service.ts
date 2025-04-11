@@ -89,10 +89,6 @@ export class CandidatesService {
 
   async recoveryPassword(id: number, newPassword: RecoveryPasswordDto) {
     const candidate = await this.findOne(id);
-    console.log(candidate)
-    console.log('Tipo de newPassword:', typeof newPassword);
-    console.log('Valor de newPassword:', newPassword);
-
     if (!candidate) {
       throw new NotFoundException('Candidato não encontrado');
     }
@@ -102,7 +98,6 @@ export class CandidatesService {
     candidate.senha_hash = passwordHash;
 
     await this.candidatoRepo.save(candidate);
-    console.log('Senha atualizada:', candidate.senha_hash);
 
     await this.candidatoRepo.save(candidate);
   }
