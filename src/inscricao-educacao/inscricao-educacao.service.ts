@@ -38,7 +38,6 @@ export class InscricaoEducacaoService {
     user: CurrentUser
   ) {
 
-    console.log('Usuário logado:', user);
     const candidateRegistered = await this.candidatoRepo.findOne({
       where: {
         id: user.sub
@@ -48,11 +47,11 @@ export class InscricaoEducacaoService {
     if (!candidateRegistered) {
       throw new ConflictException('Candidato nao cadastrado!');
     }
-
-    // const candidate = await this.findByCpf(dto.cpf);
-    // // if (candidate) {
-    // //   throw new ConflictException('Candidato já cadastrado!');
-    // // }
+    const gerarNumeroInscricao = (): string => {
+      const ano = new Date().getFullYear().toString().slice(-2); // Ex: "25" para 2025
+      const random = Math.floor(100000 + Math.random() * 900000); // número entre 100000 e 999999
+      return `EDU-${ano}-${random}`;
+    };
 
     // Função de sanitização
     function sanitize(str: string): string {
@@ -114,6 +113,7 @@ export class InscricaoEducacaoService {
       certificadoReservistaLink: savedFiles['comprovanteReservista'],
       laudoPcd: savedFiles['comprovante_laudopcd'],
       candidato: candidateRegistered,
+      numeroInscricao: gerarNumeroInscricao(),
     });
 
     await this.inscricaoEducacaoRepository.save(novaInscricao);
@@ -121,6 +121,11 @@ export class InscricaoEducacaoService {
     return {
       id: novaInscricao.id,
       pontuacao: novaInscricao.pontuacao,
+      numeroInscricao: novaInscricao.numeroInscricao,
+      nomeCompleto: novaInscricao.nomeCompleto,
+      escolaridade: novaInscricao.escolaridade,
+      cargoFuncao: novaInscricao.cargoFuncao,
+      dataDoCadastro: novaInscricao.criadoEm
     };
   }
 
@@ -223,7 +228,7 @@ export class InscricaoEducacaoService {
               possuiEspecializacao: item.inscricao_possuiEspecializacao,
               possuiMestrado: item.inscricao_possuiMestrado,
               possuiDoutorado: item.inscricao_possuiDoutorado,
-              quantidadeEspecilizacao: item.inscricao.quantidadeEspecilizacao,
+              quantidadeEspecilizacao: item.inscricao_quantidadeEspecilizacao,
             };
 
             const pontosEducacao = calcularPontosEducacao(dadosEducacao, escolaridade);
@@ -259,7 +264,7 @@ export class InscricaoEducacaoService {
       // 🔁 Monta resultado com classificação e pontos de educação
       const dataComClassificacao = data.map((item) => ({
         ...item,
-        pontosEducacao: calcularPontosEducacao(item),
+        pontosEducacao: calcularPontosEducacao(item, item.escolaridade),
         classificacao: classificacoes[item.id] || null,
       }));
 

@@ -15,6 +15,9 @@ export class InscricaoEducacao {
   @PrimaryGeneratedColumn()
   id: number;
 
+  @Column({ unique: true })
+  numeroInscricao: string;
+
   @CreateDateColumn()
   criadoEm: Date;
 

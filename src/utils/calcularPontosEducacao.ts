@@ -7,7 +7,7 @@ type DadosEducacaoSimplificado = {
   possuiDoutorado: string;
   quantidadeEspecilizacao?: string;
 };
-export function calcularPontosEducacao(item: DadosEducacaoSimplificado, escolaridade?: string): number {
+export function calcularPontosEducacao(item: DadosEducacaoSimplificado, escolaridade: string): number {
   let pontos = 0;
 
   if (escolaridade === "Fundamental") {
