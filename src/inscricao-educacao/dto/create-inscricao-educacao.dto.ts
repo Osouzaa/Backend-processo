@@ -121,8 +121,6 @@ export class CreateInscricaoEducacaoDto {
   @IsString()
   possuiEnsinoFundamental: string;
 
-
-
   @IsString()
   possuiEnsinoMedio: string;
 
