@@ -116,7 +116,6 @@ export class InscricaoEducacaoService {
       numeroInscricao: gerarNumeroInscricao(),
     });
 
-    console.log(novaInscricao)
 
     await this.inscricaoEducacaoRepository.save(novaInscricao);
 
