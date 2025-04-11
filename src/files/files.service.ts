@@ -1,4 +1,4 @@
-import { Injectable, Logger } from '@nestjs/common';
+import { Injectable, Logger, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { File } from 'src/db/entities/file.entity';
@@ -180,19 +180,17 @@ export class FilesService {
 
   async uploadEspecializacao(dto: CreateFileDto, files: Express.Multer.File[]) {
     const inscricao = await this.inscricaoService.findOne(+dto.inscricaoId);
-    if (!inscricao) throw new Error("Inscrição não encontrada!");
+    if (!inscricao) throw new NotFoundException("Inscrição não encontrada!");
 
     const { userDir, publicPathPrefix } = this.getUserDirInfo(inscricao.nomeCompleto, inscricao.cpf);
 
-    const tipos = ['frente', 'verso'];
+    const savedFiles: File[] = [];
 
-    const savedFiles = [];
-
-    files.forEach(async (file, index) => {
-      const tipo = tipos[index] || `extra${index}`;
-      const fileName = `especializacao-${tipo}.pdf`;
+    for (let i = 0; i < files.length; i++) {
+      const file = files[i];
+      const fileName = `Comprovante de Especialização-${i + 1}.pdf`;
       const filePath = path.join(userDir, fileName);
-      const savedFiles: File[] = [];
+
       fs.writeFileSync(filePath, file.buffer);
 
       const newFile = this.filesRepository.create({
@@ -203,10 +201,11 @@ export class FilesService {
 
       const savedFile = await this.filesRepository.save(newFile);
       savedFiles.push(savedFile);
-    });
+    }
 
     return {
-      message: "Arquivos salvos com sucesso!",
+      message: "Comprovantes de especialização salvos com sucesso!",
+      files: savedFiles,
     };
   }
 
@@ -220,7 +219,7 @@ export class FilesService {
 
     for (let i = 0; i < files.length; i++) {
       const file = files[i];
-      const fileName = `experiencia-${i + 1}.pdf`;
+      const fileName = `Comprovante de Experiência-${i + 1}.pdf`;
       const filePath = path.join(userDir, fileName);
 
       fs.writeFileSync(filePath, file.buffer);

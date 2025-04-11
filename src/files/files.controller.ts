@@ -54,7 +54,7 @@ export class FilesController {
   }
 
   @Post('upload-especializacao')
-  @UseInterceptors(FilesInterceptor('files', 2))
+  @UseInterceptors(FilesInterceptor('files'))
   uploadEspecializacao(
     @UploadedFiles() files: Express.Multer.File[],
     @Body() createFileDTO: CreateFileDto
