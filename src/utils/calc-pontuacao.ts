@@ -7,7 +7,8 @@ export function calcularPontuacao(dto: CreateInscricaoEducacaoDto): number {
   const calcularPontuacaoExperiencia = (dias: number, isSuperior: boolean = false): number => {
     let pontos = 0;
 
-    if (dias <= 180) pontos = 10;
+    if (dias === 0) pontos = 0;
+    else if (dias <= 180) pontos = 10;
     else if (dias <= 365) pontos = 20;
     else if (dias <= 730) pontos = 30;
     else if (dias <= 1095) pontos = 40;
