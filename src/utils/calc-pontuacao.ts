@@ -1,10 +1,11 @@
 import { CreateInscricaoEducacaoDto } from "src/inscricao-educacao/dto/create-inscricao-educacao.dto";
 
-export function calcularPontuacao(dto: CreateInscricaoEducacaoDto): number {
+export function calcularPontuacao(dto: Partial<CreateInscricaoEducacaoDto>): number {
   let pontuacao = 0;
 
   // Função base para calcular pontuação por dias de experiência
   const calcularPontuacaoExperiencia = (dias: number, isSuperior: boolean = false): number => {
+    console.log("dias", dias);
     let pontos = 0;
 
     if (dias === 0) pontos = 0;
@@ -38,7 +39,7 @@ export function calcularPontuacao(dto: CreateInscricaoEducacaoDto): number {
     if (dto.possuiMestrado === "true") pontuacao += 10;
 
     const qtdEspecializacoes = Number(dto.quantidadeEspecilizacao);
-    if (dto.possuiEspecializacao) {
+    if (dto.possuiEspecializacao === 'true') {
       if (qtdEspecializacoes === 1) pontuacao += 5;
       else if (qtdEspecializacoes === 2) pontuacao += 10;
       else if (qtdEspecializacoes >= 3) pontuacao += 15;

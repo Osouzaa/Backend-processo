@@ -42,7 +42,7 @@ export class CreateInscricaoEducacaoDto {
   @IsString()
   nacionalidade: string;
 
-  @IsNotEmpty()
+  @IsOptional()
   @IsString()
   naturalidade: string;
 

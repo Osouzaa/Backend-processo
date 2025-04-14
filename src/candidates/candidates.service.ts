@@ -64,9 +64,11 @@ export class CandidatesService {
         'candidato.id',
         'candidato.nome',
         'inscricao.id',
-        'inscricao.escolaridade', // ou os campos que você quiser
+        'inscricao.escolaridade',
         'inscricao.pontuacao',
-        'inscricao.cargoFuncao'
+        'inscricao.cargoFuncao',
+        'inscricao.atualizadoEm',
+        'inscricao.numeroInscricao'
       ])
       .getOne();
 

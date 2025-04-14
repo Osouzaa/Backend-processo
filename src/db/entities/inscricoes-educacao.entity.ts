@@ -42,7 +42,7 @@ export class InscricaoEducacao {
   @Column()
   cpf: string;
 
-  @Column()
+  @Column({ nullable: true })
   cpfLink: string;
 
   @Column()
@@ -61,7 +61,7 @@ export class InscricaoEducacao {
   @Column()
   nacionalidade: string;
 
-  @Column()
+  @Column({ nullable: true })
   naturalidade: string;
 
   @Column({ nullable: true })
@@ -114,7 +114,7 @@ export class InscricaoEducacao {
   @Column()
   estado: string;
 
-  @Column()
+  @Column({ nullable: true })
   comprovanteEnderecoLink: string;
 
   ////
