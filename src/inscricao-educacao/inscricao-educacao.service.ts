@@ -38,9 +38,6 @@ export class InscricaoEducacaoService {
     user: CurrentUser
   ) {
 
-    console.log("dto", dto);
-    console.log(files.certificadoReservistaLink?.length)
-
     const candidateRegistered = await this.candidatoRepo.findOne({
       where: {
         id: user.sub

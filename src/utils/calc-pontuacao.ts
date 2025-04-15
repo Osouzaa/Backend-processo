@@ -5,7 +5,6 @@ export function calcularPontuacao(dto: Partial<CreateInscricaoEducacaoDto>): num
 
   // Função base para calcular pontuação por dias de experiência
   const calcularPontuacaoExperiencia = (dias: number, isSuperior: boolean = false): number => {
-    console.log("dias", dias);
     let pontos = 0;
 
     if (dias === 0) pontos = 0;
