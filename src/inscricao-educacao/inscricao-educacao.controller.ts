@@ -23,7 +23,7 @@ export class InscricaoEducacaoController {
   @UseInterceptors(FileFieldsInterceptor([
     { name: 'cpfLink', maxCount: 1 },
     { name: 'comprovanteEnderecoLink', maxCount: 1 },
-    { name: 'comprovanteReservistaLink', maxCount: 1 },
+    { name: 'certificadoReservistaLink', maxCount: 1 },
     { name: 'laudoPcd', maxCount: 1 },
   ]))
   create(
@@ -32,7 +32,7 @@ export class InscricaoEducacaoController {
     @UploadedFiles() files: {
       cpfLink?: Express.Multer.File[],
       comprovanteEnderecoLink?: Express.Multer.File[],
-      comprovanteReservistaLink?: Express.Multer.File[],
+      certificadoReservistaLink?: Express.Multer.File[],
       laudoPcd?: Express.Multer.File[]
     }
   ) {

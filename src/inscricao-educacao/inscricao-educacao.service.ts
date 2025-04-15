@@ -32,11 +32,15 @@ export class InscricaoEducacaoService {
     files: {
       cpfLink?: Express.Multer.File[];
       comprovanteEnderecoLink?: Express.Multer.File[];
-      comprovanteReservistaLink?: Express.Multer.File[];
+      certificadoReservistaLink?: Express.Multer.File[];
       laudoPcd?: Express.Multer.File[];
     },
     user: CurrentUser
   ) {
+
+    console.log("dto", dto);
+    console.log(files.certificadoReservistaLink?.length)
+
     const candidateRegistered = await this.candidatoRepo.findOne({
       where: {
         id: user.sub
@@ -87,10 +91,10 @@ export class InscricaoEducacaoService {
       savedFiles['comprovanteEndereco'] = `${this.BASE_URL}/${userFolder}/${fileName}`;
     }
 
-    if (files.comprovanteReservistaLink?.length) {
+    if (files.certificadoReservistaLink?.length) {
       const fileName = 'comprovante_reservista.pdf';
       const filePath = path.join(userDir, fileName);
-      fs.writeFileSync(filePath, files.comprovanteReservistaLink[0].buffer);
+      fs.writeFileSync(filePath, files.certificadoReservistaLink[0].buffer);
 
       savedFiles['comprovanteReservista'] = `${this.BASE_URL}/${userFolder}/${fileName}`;
     }
