@@ -23,7 +23,7 @@ export class CreateInscricaoEducacaoDto {
   cpf: string;
 
   // @IsString()
-  // @IsNotEmpty()
+  // @IsOptional()
   // cpfLink: string;
 
   @IsNotEmpty()
@@ -113,7 +113,7 @@ export class CreateInscricaoEducacaoDto {
 
 
   // @IsString()
-  // @IsNotEmpty()
+  // @IsOptional()
   // comprovanteEnderecoLink: string;
 
 
