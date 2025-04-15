@@ -21,19 +21,18 @@ export class InscricaoEducacaoController {
   @UseGuards(AuthGuard, AuthGuardCandidates)
   @Post()
   @UseInterceptors(FileFieldsInterceptor([
-    { name: 'cpfFile', maxCount: 1 },
-    { name: 'comprovanteEndereco', maxCount: 1 },
-    { name: 'comprovanteReservista', maxCount: 1 },
+    { name: 'cpfLink', maxCount: 1 },
+    { name: 'comprovanteEnderecoLink', maxCount: 1 },
+    { name: 'comprovanteReservistaLink', maxCount: 1 },
     { name: 'laudoPcd', maxCount: 1 },
-    { name: 'comprovanteExperiencia', maxCount: 1 },
   ]))
   create(
     @CurrentUser() user: CurrentUser,
     @Body() createInscricaoEducacaoDto: CreateInscricaoEducacaoDto,
     @UploadedFiles() files: {
-      cpfFile?: Express.Multer.File[],
-      comprovanteEndereco?: Express.Multer.File[],
-      comprovanteReservista?: Express.Multer.File[],
+      cpfLink?: Express.Multer.File[],
+      comprovanteEnderecoLink?: Express.Multer.File[],
+      comprovanteReservistaLink?: Express.Multer.File[],
       laudoPcd?: Express.Multer.File[]
     }
   ) {

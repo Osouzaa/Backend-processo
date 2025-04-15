@@ -30,15 +30,13 @@ export class InscricaoEducacaoService {
   async create(
     dto: CreateInscricaoEducacaoDto,
     files: {
-      cpfFile?: Express.Multer.File[];
-      comprovanteEndereco?: Express.Multer.File[];
-      comprovanteReservista?: Express.Multer.File[];
+      cpfLink?: Express.Multer.File[];
+      comprovanteEnderecoLink?: Express.Multer.File[];
+      comprovanteReservistaLink?: Express.Multer.File[];
       laudoPcd?: Express.Multer.File[];
-      comprovanteExperiencia?: Express.Multer.File[];
     },
     user: CurrentUser
   ) {
-
     const candidateRegistered = await this.candidatoRepo.findOne({
       where: {
         id: user.sub
@@ -73,26 +71,26 @@ export class InscricaoEducacaoService {
 
     const savedFiles: { [key: string]: string } = {};
 
-    if (files.cpfFile?.length) {
+    if (files.cpfLink?.length) {
       const fileName = 'cpf.pdf';
       const filePath = path.join(userDir, fileName);
-      fs.writeFileSync(filePath, files.cpfFile[0].buffer);
+      fs.writeFileSync(filePath, files.cpfLink[0].buffer);
 
       savedFiles['cpfFile'] = `${this.BASE_URL}/${userFolder}/${fileName}`;
     }
 
-    if (files.comprovanteEndereco?.length) {
+    if (files.comprovanteEnderecoLink?.length) {
       const fileName = 'comprovante_endereco.pdf';
       const filePath = path.join(userDir, fileName);
-      fs.writeFileSync(filePath, files.comprovanteEndereco[0].buffer);
+      fs.writeFileSync(filePath, files.comprovanteEnderecoLink[0].buffer);
 
       savedFiles['comprovanteEndereco'] = `${this.BASE_URL}/${userFolder}/${fileName}`;
     }
 
-    if (files.comprovanteReservista?.length) {
+    if (files.comprovanteReservistaLink?.length) {
       const fileName = 'comprovante_reservista.pdf';
       const filePath = path.join(userDir, fileName);
-      fs.writeFileSync(filePath, files.comprovanteReservista[0].buffer);
+      fs.writeFileSync(filePath, files.comprovanteReservistaLink[0].buffer);
 
       savedFiles['comprovanteReservista'] = `${this.BASE_URL}/${userFolder}/${fileName}`;
     }
