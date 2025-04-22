@@ -131,8 +131,6 @@ export class CandidatoAuthService {
   }
   async alterarSenha(email: string, codigo: string, novaSenha: string) {
     const candidato = await this.candidatoRepo.findOne({ where: { email } });
-    console.log(candidato)
-    console.log(novaSenha)
 
     if (!candidato) {
       throw new UnauthorizedException('Candidato não encontrado com esse e-mail.');
@@ -144,9 +142,7 @@ export class CandidatoAuthService {
 
     // Criptografa a nova senha
     const senhaCriptografada = await bcrypt.hash(novaSenha, 8);
-    console.log(senhaCriptografada)
 
-    // Atualiza a senha
     candidato.senha_hash = senhaCriptografada;
     candidato.codigoVerificacao = null; // Limpa o código de verificação após a alteração da senha
     await this.candidatoRepo.save(candidato);
