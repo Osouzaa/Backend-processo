@@ -26,6 +26,12 @@ export class Candidato {
   @Column()
   senha_hash: string;
 
+  @Column({ type: 'varchar', nullable: true })
+  codigoVerificacao: string | null;
+
+  @Column({ default: false })
+  verificado: boolean;
+
   @OneToMany(() => InscricaoEducacao, (inscricao) => inscricao.candidato)
   inscricoesEducacao: InscricaoEducacao[];
 }

@@ -23,4 +23,20 @@ export class CandidatoAuthController {
   async register(@Body() registerDto: RegisterCandidatoDTO) {
     return this.authService.register(registerDto);
   }
+
+  @Post('verificar-codigo')
+  verificarCodigo(@Body() dto: { cpf: string; codigo: string }) {
+    return this.authService.verificarCodigo(dto.cpf, dto.codigo);
+  }
+
+  @Post('recuperar-senha')
+  async recuperarSenha(@Body() { email }: { email: string }) {
+    return this.authService.recuperarSenha(email);
+  }
+
+  // Nova rota para redefinir a senha
+  @Post('alterar-senha')
+  async alterarSenha(@Body() { email, codigo, novaSenha }: { email: string, codigo: string, novaSenha: string }) {
+    return this.authService.alterarSenha(email, codigo, novaSenha);
+  }
 }

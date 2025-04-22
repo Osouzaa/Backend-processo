@@ -6,6 +6,7 @@ import { Candidato } from 'src/db/entities/candidato.entity';
 import { CandidatoAuthController } from './candidato-auth.controller';
 import { CandidatoAuthService } from './candidato-auth.service';
 import { jwtConstants } from 'src/auth/constants';
+import { MailerService } from 'src/mail/mail.service';
 
 @Module({
   imports: [
@@ -16,6 +17,6 @@ import { jwtConstants } from 'src/auth/constants';
     }),
   ],
   controllers: [CandidatoAuthController],
-  providers: [CandidatoAuthService, JwtModule],
+  providers: [CandidatoAuthService, JwtModule, MailerService],
 })
 export class CandidatoAuthModule { }
