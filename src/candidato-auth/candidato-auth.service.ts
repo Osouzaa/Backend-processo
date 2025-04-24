@@ -1,4 +1,4 @@
-import { Injectable, UnauthorizedException, ConflictException } from '@nestjs/common';
+import { Injectable, UnauthorizedException, ConflictException, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { JwtService } from '@nestjs/jwt';
@@ -55,7 +55,6 @@ export class CandidatoAuthService {
     if (candidato.verificado) {
       throw new ConflictException('Este candidato já foi verificado. Faça login normalmente.');
     }
-
     if (candidato.codigoVerificacao !== codigo) {
       throw new UnauthorizedException('Código de verificação inválido. Verifique sua caixa de entrada ou spam.');
     }
@@ -65,6 +64,9 @@ export class CandidatoAuthService {
     await this.candidatoRepo.save(candidato);
 
     return { message: 'Candidato verificado com sucesso!' };
+
+
+
   }
 
   async login(dto: LoginCandidatoDto) {
@@ -85,7 +87,7 @@ export class CandidatoAuthService {
       await this.mailerService.enviarCodigoVerificacao(candidato.email, novoCodigo, dto.cpf);
 
       throw new UnauthorizedException(
-        'E-mail ainda não verificado. Enviamos um novo código de verificação para sua caixa de entrada.'
+        'Enviamos um codigo de verificação para o seu e-mail. Verifique sua caixa de entrada ou spam.',
       );
     }
 
@@ -105,9 +107,24 @@ export class CandidatoAuthService {
 
     return {
       access_token,
+      sub: candidato.id
     };
   }
 
+  async updatedVerified(id: number) {
+    const candidate = await this.candidatoRepo.findOne({ where: { id } });
+    console.log(candidate)
+
+    if (!candidate) {
+      throw new NotFoundException('Candidato não encontrado');
+    }
+
+    candidate.verificado = false;
+
+    await this.candidatoRepo.save(candidate);
+
+    return { message: 'Verificação do candidato atualizada com sucesso.' };
+  }
   async recuperarSenha(email: string) {
     const candidato = await this.candidatoRepo.findOne({ where: { email } });
 

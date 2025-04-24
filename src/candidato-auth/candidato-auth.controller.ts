@@ -4,6 +4,8 @@ import {
   Body,
   HttpCode,
   HttpStatus,
+  Patch,
+  Query,
 } from '@nestjs/common';
 import { CandidatoAuthService } from './candidato-auth.service';
 import { LoginCandidatoDto } from './dto/login-candidato.dto';
@@ -39,4 +41,10 @@ export class CandidatoAuthController {
   async alterarSenha(@Body() { email, codigo, novaSenha }: { email: string, codigo: string, novaSenha: string }) {
     return this.authService.alterarSenha(email, codigo, novaSenha);
   }
+
+  @Patch('updated-verified')
+  async alterarVerificao(@Query('id') id: number) {
+    return this.authService.updatedVerified(id);
+  }
+
 }
