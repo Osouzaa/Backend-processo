@@ -38,7 +38,7 @@ export class MailerService {
         </div>
   
         <div style="text-align: center; margin: 30px 0;">
-          <a href="http://localhost:3512/user/login/verification?cpf=${encodeURIComponent(cpf)}&codigo=${encodeURIComponent(codigo)}"
+          <a href="https://psseduc.ibirite.mg.gov.br/user/login/verification?cpf=${encodeURIComponent(cpf)}&codigo=${encodeURIComponent(codigo)}"
              style="display: inline-block; padding: 14px 28px; background-color: #00009B; color: #fff; text-decoration: none; font-size: 16px; border-radius: 6px;">
             Verificar agora
           </a>
@@ -83,7 +83,7 @@ export class MailerService {
         </div>
   
         <div style="text-align: center; margin: 30px 0;">
-          <a href="http://localhost:3512/user/login/verification?recoveryPassword=true&codigo=${encodeURIComponent(codigo)}&email=${encodeURIComponent(email)}"
+          <a href="https://psseduc.ibirite.mg.gov.br/user/login/verification?recoveryPassword=true&codigo=${encodeURIComponent(codigo)}&email=${encodeURIComponent(email)}"
              style="display: inline-block; padding: 14px 28px; background-color: #0066cc; color: #fff; text-decoration: none; font-size: 16px; border-radius: 6px; text-transform: uppercase; font-weight: bold;">
             Definir Nova Senha
           </a>
