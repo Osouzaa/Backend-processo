@@ -9,15 +9,7 @@ import * as fs from 'fs';
 
 async function bootstrap() {
 
-  const keyFile = fs.readFileSync(__dirname + '/../src/certs/key.pem');
-  const certFile = fs.readFileSync(__dirname + '/../src/certs/cert.pem');
-
-  const app = await NestFactory.create(AppModule, {
-    httpsOptions: {
-      key: keyFile,
-      cert: certFile
-    }
-  });
+  const app = await NestFactory.create(AppModule);
 
   app.useGlobalPipes(new ValidationPipe());
   app.use(helmet());
