@@ -25,10 +25,11 @@ export class CandidatesController {
     return this.candidatesService.create(createCandidateDto);
   }
 
-  @Get()
-  findAll() {
-    return this.candidatesService.findAll();
-  }
+  // @UseGuards()
+  // @Get()
+  // findAll() {
+  //   return this.candidatesService.findAll();
+  // }
 
   @Get('verification/:cpf')
   findByCpf(@Param('cpf') cpf: string) {
