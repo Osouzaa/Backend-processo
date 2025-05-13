@@ -113,7 +113,6 @@ export class CandidatoAuthService {
 
   async updatedVerified(id: number) {
     const candidate = await this.candidatoRepo.findOne({ where: { id } });
-    console.log(candidate)
 
     if (!candidate) {
       throw new NotFoundException('Candidato não encontrado');

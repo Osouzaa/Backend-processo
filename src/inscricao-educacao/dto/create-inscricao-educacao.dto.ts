@@ -47,7 +47,7 @@ export class CreateInscricaoEducacaoDto {
   naturalidade: string;
 
   @IsOptional()
-  @IsString()
+  @IsString() 
   cidadeNaturalidade: string;
 
   @IsOptional()
@@ -69,10 +69,6 @@ export class CreateInscricaoEducacaoDto {
   @IsOptional()
   @IsString()
   pcd: string;
-
-  @IsOptional()
-  @IsString()
-  laudoPcd?: string;
 
   @IsOptional()
   @IsString()
