@@ -20,28 +20,27 @@ export function calcularPontuacao(dto: Partial<CreateInscricaoEducacaoDto>): num
   const diasExperiencia = Number(dto.tempoExperiencia);
 
   if (dto.escolaridade === "Fundamental") {
-    if (dto.possuiEnsinoMedio === "true") pontuacao += 10;
-    if (dto.possuiEnsinoSuperior === "true") pontuacao += 10;
+    if (dto.possuiEnsinoMedio === "true") pontuacao += 20;
+    if (dto.possuiEnsinoSuperior === "true") pontuacao += 30;
 
     pontuacao += calcularPontuacaoExperiencia(diasExperiencia);
   }
 
   if (dto.escolaridade === "Médio") {
-    if (dto.possuiEnsinoSuperior === "true") pontuacao += 10;
-    if (dto.possuiCursoAreaEducacao === "true") pontuacao += 10;
+    if (dto.possuiEnsinoSuperior === "true") pontuacao += 20;
+    if (dto.possuiCursoAreaEducacao === "true") pontuacao += 30;
 
     pontuacao += calcularPontuacaoExperiencia(diasExperiencia);
   }
 
   if (dto.escolaridade === "Superior") {
-    if (dto.possuiDoutorado === "true") pontuacao += 20;
-    if (dto.possuiMestrado === "true") pontuacao += 10;
+    if (dto.possuiDoutorado === "true") pontuacao += 35;
+    if (dto.possuiMestrado === "true") pontuacao += 30;
 
     const qtdEspecializacoes = Number(dto.quantidadeEspecilizacao);
     if (dto.possuiEspecializacao === 'true') {
       if (qtdEspecializacoes === 1) pontuacao += 5;
       else if (qtdEspecializacoes === 2) pontuacao += 10;
-      else if (qtdEspecializacoes >= 3) pontuacao += 15;
     }
 
     pontuacao += calcularPontuacaoExperiencia(diasExperiencia, true); // metade da pontuação
