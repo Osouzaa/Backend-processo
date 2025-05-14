@@ -58,6 +58,9 @@ export class InscricaoEducacao {
   @Column({ nullable: true })
   certificadoReservistaLink: string;
 
+  @Column({ nullable: true })
+  cotaRacialLink: string;
+
   @Column()
   nacionalidade: string;
 

@@ -34,6 +34,7 @@ export class InscricaoEducacaoController {
       comprovanteEnderecoLink?: Express.Multer.File[],
       certificadoReservistaLink?: Express.Multer.File[],
       laudoPcd?: Express.Multer.File[]
+      cotaRacialLink?: Express.Multer.File[]
     }
   ) {
     return this.inscricaoEducacaoService.create(createInscricaoEducacaoDto, files, user);

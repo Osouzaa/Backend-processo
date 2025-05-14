@@ -78,8 +78,8 @@ export class CreateInscricaoEducacaoDto {
   @IsString()
   cargoFuncao: string;
 
-  @IsNotEmpty()
   @IsBoolean()
+  @Transform(({ value }) => value === 'true')
   cotaRacial: boolean;
 
   // Endereço

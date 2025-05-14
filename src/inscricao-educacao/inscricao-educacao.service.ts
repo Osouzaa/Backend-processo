@@ -34,6 +34,7 @@ export class InscricaoEducacaoService {
       comprovanteEnderecoLink?: Express.Multer.File[];
       certificadoReservistaLink?: Express.Multer.File[];
       laudoPcd?: Express.Multer.File[];
+      cotaRacialLink?: Express.Multer.File[]
     },
     user: CurrentUser
   ) {
@@ -80,6 +81,15 @@ export class InscricaoEducacaoService {
       savedFiles['cpfFile'] = `${this.BASE_URL}/${userFolder}/${fileName}`;
     }
 
+    
+    if (files.cotaRacialLink?.length) {
+      const fileName = 'Documento de Cota Racial.pdf';
+      const filePath = path.join(userDir, fileName);
+      fs.writeFileSync(filePath, files.cotaRacialLink[0].buffer);
+
+      savedFiles['cotaRacialLink'] = `${this.BASE_URL}/${userFolder}/${fileName}`;
+    }
+
     if (files.comprovanteEnderecoLink?.length) {
       const fileName = 'comprovante_endereco.pdf';
       const filePath = path.join(userDir, fileName);
@@ -112,6 +122,7 @@ export class InscricaoEducacaoService {
       comprovanteEnderecoLink: savedFiles['comprovanteEndereco'],
       certificadoReservistaLink: savedFiles['comprovanteReservista'],
       laudoPcd: savedFiles['comprovante_laudopcd'],
+      cotaRacialLink: savedFiles['cotaRacialLink'],
       candidato: candidateRegistered,
       numeroInscricao: gerarNumeroInscricao(),
     });
