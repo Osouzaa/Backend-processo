@@ -85,6 +85,9 @@ export class InscricaoEducacao {
   @Column()
   cargoFuncao: string;
 
+  @Column({default: false})
+  cotaRacial: boolean
+
   // Endereço
 
   @Column({ nullable: true })
