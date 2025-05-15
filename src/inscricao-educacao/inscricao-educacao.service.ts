@@ -151,6 +151,8 @@ export class InscricaoEducacaoService {
         escolaridade,
         cargoFuncao,
         nomeCompleto,
+        cotaRacial,
+        pcd,
         page = 1,
       } = query;
 
@@ -171,6 +173,14 @@ export class InscricaoEducacaoService {
       if (escolaridade) {
         qb.andWhere('inscricao.escolaridade = :escolaridade', { escolaridade });
       }
+
+      if (cotaRacial) {
+        qb.andWhere('inscricao.cotaRacial = :cotaRacial', { cotaRacial });
+      }
+
+      if (pcd) {
+        qb.andWhere('inscricao.pcd = :pcd', { pcd });
+      } 
 
       if (cargoFuncao) {
         qb.andWhere('inscricao.cargoFuncao = :cargoFuncao', { cargoFuncao });

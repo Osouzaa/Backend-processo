@@ -18,4 +18,16 @@ export class QueryInscricaoEducacaoDto {
   @IsString()
   cargoFuncao: string;
 
+
+  @IsOptional()
+  @IsString()
+  cotaRacial: string;
+
+    @IsOptional()
+  @IsString()
+  pcd: string;
+
+
+
+
 }
