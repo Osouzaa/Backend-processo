@@ -159,6 +159,7 @@ export class InscricaoEducacaoService {
 
       const qb = this.inscricaoEducacaoRepository.createQueryBuilder('inscricao');
       qb.orderBy('inscricao.cargoFuncao', 'ASC');
+      qb.orderBy('pontuacao', 'DESC')
       // 🔍 Filtros de pesquisa
       if (cpf) {
         qb.andWhere(
