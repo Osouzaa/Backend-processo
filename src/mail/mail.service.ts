@@ -28,14 +28,8 @@ export class MailerService {
         <p style="font-size: 16px; color: #333;">Olá,</p>
   
         <p style="font-size: 16px; color: #333;">
-          Para concluir seu cadastro no sistema de Processos Seletivos da <strong>Prefeitura de Ibirité</strong>, clique no botão abaixo ou insira o código de verificação no sistema:
+          Para concluir seu cadastro no sistema de Processos Seletivos da <strong>Prefeitura de Ibirité</strong>, clique no botão abaixo:
         </p>
-  
-        <div style="text-align: center; margin: 30px 0;">
-          <span style="display: inline-block; background-color: #FFC300; color: #000; font-size: 26px; font-weight: bold; padding: 15px 30px; border-radius: 8px; border: 2px solid #00009B;">
-            ${codigo}
-          </span>
-        </div>
   
         <div style="text-align: center; margin: 30px 0;">
           <a href="https://psseduc.ibirite.mg.gov.br/user/login/verification?cpf=${encodeURIComponent(cpf)}&codigo=${encodeURIComponent(codigo)}"
@@ -73,14 +67,8 @@ export class MailerService {
         
         <p style="font-size: 16px; color: #333; text-align: center;">
           Olá,<br>
-          Você solicitou a recuperação de sua senha. Para continuar, insira o código abaixo no sistema ou clique no botão para definir uma nova senha:
+          Você solicitou a recuperação de sua senha. Para continuar, clique no botão para definir uma nova senha:
         </p>
-  
-        <div style="text-align: center; margin: 30px 0;">
-          <span style="display: inline-block; background-color: #ffc107; color: #000; font-size: 26px; font-weight: bold; padding: 15px 30px; border-radius: 8px; border: 2px solid #0066cc;">
-            ${codigo}
-          </span>
-        </div>
   
         <div style="text-align: center; margin: 30px 0;">
           <a href="https://psseduc.ibirite.mg.gov.br/user/login/verification?recoveryPassword=true&codigo=${encodeURIComponent(codigo)}&email=${encodeURIComponent(email)}"
