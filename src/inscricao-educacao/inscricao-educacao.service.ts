@@ -158,7 +158,7 @@ export class InscricaoEducacaoService {
       const skip = (page - 1) * take;
 
       const qb = this.inscricaoEducacaoRepository.createQueryBuilder('inscricao');
-
+      qb.orderBy('inscricao.cargoFuncao', 'ASC');
       // 🔍 Filtros de pesquisa
       if (cpf) {
         qb.andWhere(
@@ -298,8 +298,6 @@ export class InscricaoEducacaoService {
       throw new Error('Erro ao buscar inscrições.');
     }
   }
-
-
 
 
   async exportToExcel(): Promise<Uint8Array> {
