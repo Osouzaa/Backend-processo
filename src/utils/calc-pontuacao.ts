@@ -8,10 +8,10 @@ export function calcularPontuacao(dto: Partial<CreateInscricaoEducacaoDto>): num
     let pontos = 0;
 
     if (dias === 0) pontos = 0;
-    else if (dias <= 180) pontos = 10;
-    else if (dias <= 365) pontos = 20;
-    else if (dias <= 730) pontos = 30;
-    else if (dias <= 1095) pontos = 40;
+    else if (dias <= 365) pontos = 10;
+    else if (dias <= 730) pontos = 20;
+    else if (dias <= 1095) pontos = 30;
+    else if (dias <= 1460) pontos = 40;
     else pontos = 50;
 
     return isSuperior ? Math.floor(pontos / 2) : pontos;
