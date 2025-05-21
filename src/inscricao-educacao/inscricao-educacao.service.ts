@@ -181,16 +181,22 @@ export class InscricaoEducacaoService {
         qb.andWhere('inscricao.pcd = :pcd', { pcd });
       }
 
-      if (cargoFuncao) {
-        qb.andWhere('inscricao.cargoFuncao = :cargoFuncao', { cargoFuncao });
+      if (cargoFuncao || cotaRacial) {
+        if (cargoFuncao) {
+          qb.andWhere('inscricao.cargoFuncao = :cargoFuncao', { cargoFuncao });
+        }
+
+        if (cotaRacial) {
+          qb.andWhere('inscricao.cotaRacial = :cotaRacial', { cotaRacial });
+        }
 
         // 🧠 Ordenação com critérios de desempate
         qb.addOrderBy('inscricao.pontuacao', 'DESC')
           .addOrderBy(
             `CASE 
-              WHEN EXTRACT(YEAR FROM AGE(CURRENT_DATE, TO_DATE(inscricao.dataNascimento, 'YYYY-MM-DD'))) >= 60 
-              THEN 1 ELSE 2 
-            END`,
+        WHEN EXTRACT(YEAR FROM AGE(CURRENT_DATE, TO_DATE(inscricao.dataNascimento, 'YYYY-MM-DD'))) >= 60 
+        THEN 1 ELSE 2 
+      END`,
             'ASC'
           )
           .addOrderBy('inscricao.totalDeDias', 'DESC')
