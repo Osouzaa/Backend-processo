@@ -73,29 +73,27 @@ export class CandidatoAuthService {
     const candidato = await this.candidatoRepo.findOne({ where: { cpf: dto.cpf } });
 
     if (!candidato) {
-      throw new UnauthorizedException('Credenciais inválidas');
-    }
-
-    if (!candidato.verificado) {
-      // Gera um novo código de verificação
-      const novoCodigo = Math.floor(100000 + Math.random() * 900000).toString();
-      candidato.codigoVerificacao = novoCodigo;
-
-      await this.candidatoRepo.save(candidato);
-
-      // Reenvia o e-mail com o novo código
-      await this.mailerService.enviarCodigoVerificacao(candidato.email, novoCodigo, dto.cpf);
-
-      throw new HttpException(
-        'Enviamos um código de verificação para o seu e-mail. Verifique sua caixa de entrada ou spam.',
-        HttpStatus.PRECONDITION_REQUIRED // 428 ou pode ser HttpStatus.FORBIDDEN (403)
-      );
+      throw new NotFoundException('Credenciais inválidas'); // 404
     }
 
     const senhaCorreta = await bcrypt.compare(dto.senha, candidato.senha_hash);
 
     if (!senhaCorreta) {
-      throw new UnauthorizedException('Credenciais inválidas');
+      throw new UnauthorizedException('Credenciais inválidas'); // 401
+    }
+
+    if (!candidato.verificado) {
+      const novoCodigo = Math.floor(100000 + Math.random() * 900000).toString();
+      candidato.codigoVerificacao = novoCodigo;
+
+      await this.candidatoRepo.save(candidato);
+
+      await this.mailerService.enviarCodigoVerificacao(candidato.email, novoCodigo, dto.cpf);
+
+      throw new HttpException(
+        'Enviamos um código de verificação para o seu e-mail. Verifique sua caixa de entrada ou spam.',
+        HttpStatus.PRECONDITION_REQUIRED, // 428
+      );
     }
 
     const payload = {
@@ -108,7 +106,7 @@ export class CandidatoAuthService {
 
     return {
       access_token,
-      sub: candidato.id
+      sub: candidato.id,
     };
   }
 
