@@ -81,7 +81,7 @@ export class InscricaoEducacaoService {
       savedFiles['cpfFile'] = `${this.BASE_URL}/${userFolder}/${fileName}`;
     }
 
-    
+
     if (files.cotaRacialLink?.length) {
       const fileName = 'Documento de Cota Racial.pdf';
       const filePath = path.join(userDir, fileName);
@@ -160,8 +160,7 @@ export class InscricaoEducacaoService {
       const skip = (page - 1) * take;
 
       const qb = this.inscricaoEducacaoRepository.createQueryBuilder('inscricao');
-      qb.orderBy('inscricao.cargoFuncao', 'ASC')
-        .addOrderBy('pontuacao', 'DESC');
+      qb.orderBy('inscricao.pontuacao', 'DESC')
       // 🔍 Filtros de pesquisa
       if (cpf) {
         qb.andWhere(
@@ -180,7 +179,7 @@ export class InscricaoEducacaoService {
 
       if (pcd) {
         qb.andWhere('inscricao.pcd = :pcd', { pcd });
-      } 
+      }
 
       if (cargoFuncao) {
         qb.andWhere('inscricao.cargoFuncao = :cargoFuncao', { cargoFuncao });
