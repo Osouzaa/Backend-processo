@@ -61,7 +61,7 @@ export class MailerService {
         html,
       });
     } catch (error) {
-      this.logger.error(`Erro ao enviar e-mail de verificação para ${email}`, error.stack);
+      this.logger.error(`Erro ao enviar e-mail de verificação para ${email}`, error.message);
       throw new BadRequestException('Não foi possível enviar o e-mail de verificação.');
     }
   }
@@ -104,7 +104,7 @@ export class MailerService {
         html,
       });
     } catch (error) {
-      this.logger.error(`Erro ao enviar e-mail de recuperação para ${email}`, error.stack);
+      this.logger.error(`Erro ao enviar e-mail de recuperação para ${email}`, error.message);
       throw new BadRequestException('Não foi possível enviar o e-mail de recuperação.');
     }
   }
