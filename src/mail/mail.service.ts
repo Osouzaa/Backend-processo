@@ -1,10 +1,11 @@
 // src/mailer/mailer.service.ts
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable, Logger } from '@nestjs/common';
 import * as nodemailer from 'nodemailer';
 import { env } from 'src/env';
 
 @Injectable()
 export class MailerService {
+  private readonly logger = new Logger(MailerService.name);
   private transporter = nodemailer.createTransport({
     host: env.EMAIL_HOST,
     port: 587,
@@ -52,12 +53,17 @@ export class MailerService {
 
 
 
-    await this.transporter.sendMail({
-      from: `"Prefeitura de Ibirité" ${env.EMAIL_FROM}`,
-      to: email,
-      subject: 'Código de Verificação',
-      html,
-    });
+    try {
+      await this.transporter.sendMail({
+        from: `"Prefeitura de Ibirité" <${env.EMAIL_FROM}>`,
+        to: email,
+        subject: 'Código de Verificação',
+        html,
+      });
+    } catch (error) {
+      this.logger.error(`Erro ao enviar e-mail de verificação para ${email}`, error.stack);
+      throw new BadRequestException('Não foi possível enviar o e-mail de verificação.');
+    }
   }
   async enviarCodigoRecuperacao(email: string, codigo: string) {
     const html = `
@@ -90,12 +96,17 @@ export class MailerService {
     </div>
   `;
 
-    await this.transporter.sendMail({
-      from: `"Prefeitura de Ibirité" <${env.EMAIL_FROM}>`,
-      to: email,
-      subject: 'Código de Recuperação de Senha',
-      html,
-    });
+    try {
+      await this.transporter.sendMail({
+        from: `"Prefeitura de Ibirité" <${env.EMAIL_FROM}>`,
+        to: email,
+        subject: 'Código de Recuperação de Senha',
+        html,
+      });
+    } catch (error) {
+      this.logger.error(`Erro ao enviar e-mail de recuperação para ${email}`, error.stack);
+      throw new BadRequestException('Não foi possível enviar o e-mail de recuperação.');
+    }
   }
 
 }

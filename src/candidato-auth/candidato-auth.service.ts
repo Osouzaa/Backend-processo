@@ -1,4 +1,4 @@
-import { Injectable, UnauthorizedException, ConflictException, NotFoundException } from '@nestjs/common';
+import { Injectable, UnauthorizedException, ConflictException, NotFoundException, HttpException, HttpStatus } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { JwtService } from '@nestjs/jwt';
@@ -19,6 +19,10 @@ export class CandidatoAuthService {
 
   async register(dto: RegisterCandidatoDTO) {
     const existing = await this.candidatoRepo.findOne({ where: { cpf: dto.cpf } });
+
+    if (!existing) {
+      throw new NotFoundException('Candidato nao encontrado');
+    }
 
     if (existing) {
       throw new ConflictException('Candidato já cadastrado!');
@@ -86,8 +90,9 @@ export class CandidatoAuthService {
       // Reenvia o e-mail com o novo código
       await this.mailerService.enviarCodigoVerificacao(candidato.email, novoCodigo, dto.cpf);
 
-      throw new UnauthorizedException(
-        'Enviamos um codigo de verificação para o seu e-mail. Verifique sua caixa de entrada ou spam.',
+      throw new HttpException(
+        'Enviamos um código de verificação para o seu e-mail. Verifique sua caixa de entrada ou spam.',
+        HttpStatus.PRECONDITION_REQUIRED // 428 ou pode ser HttpStatus.FORBIDDEN (403)
       );
     }
 
