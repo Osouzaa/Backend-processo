@@ -17,7 +17,7 @@ export function calcularPontuacao(dto: Partial<CreateInscricaoEducacaoDto>): num
     return isSuperior ? Math.floor(pontos / 2) : pontos;
   };
 
-  const diasExperiencia = Number(dto.tempoExperiencia);
+  const diasExperiencia = Number(dto.totalDeDias);
 
   if (dto.escolaridade === "Fundamental") {
     if (dto.possuiEnsinoMedio === "true") pontuacao += 20;
