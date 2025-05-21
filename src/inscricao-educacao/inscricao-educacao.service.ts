@@ -296,7 +296,6 @@ export class InscricaoEducacaoService {
         classificacao: classificacoes[item.id] || null,
       }));
 
-      console.log(dataComClassificacao)
 
       // ✅ Ordenar por classificação (exibido corretamente no frontend)
       const dataOrdenadaPorClassificacao = dataComClassificacao.sort((a, b) => {

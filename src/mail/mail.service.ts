@@ -52,7 +52,6 @@ export class MailerService {
   `;
 
 
-
     try {
       await this.transporter.sendMail({
         from: `"Prefeitura de Ibirité" <${env.EMAIL_FROM}>`,
