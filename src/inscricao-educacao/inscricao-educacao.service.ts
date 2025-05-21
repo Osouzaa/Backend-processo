@@ -202,12 +202,6 @@ export class InscricaoEducacaoService {
           );
       }
 
-      if (nomeCompleto) {
-        qb.andWhere('LOWER(inscricao.nomeCompleto) LIKE LOWER(:nomeCompleto)', {
-          nomeCompleto: `%${nomeCompleto}%`,
-        });
-      }
-
       // Paginação
       qb.skip(skip).take(take);
 
@@ -301,6 +295,8 @@ export class InscricaoEducacaoService {
         pontosEducacao: calcularPontosEducacao(item, item.escolaridade),
         classificacao: classificacoes[item.id] || null,
       }));
+
+      console.log(dataComClassificacao)
 
       // ✅ Ordenar por classificação (exibido corretamente no frontend)
       const dataOrdenadaPorClassificacao = dataComClassificacao.sort((a, b) => {
