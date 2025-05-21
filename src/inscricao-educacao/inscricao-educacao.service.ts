@@ -181,13 +181,9 @@ export class InscricaoEducacaoService {
         qb.andWhere('inscricao.pcd = :pcd', { pcd });
       }
 
-      if (cargoFuncao || cotaRacial) {
+      if (cargoFuncao) {
         if (cargoFuncao) {
           qb.andWhere('inscricao.cargoFuncao = :cargoFuncao', { cargoFuncao });
-        }
-
-        if (cotaRacial) {
-          qb.andWhere('inscricao.cotaRacial = :cotaRacial', { cotaRacial });
         }
 
         // 🧠 Ordenação com critérios de desempate
@@ -221,7 +217,7 @@ export class InscricaoEducacaoService {
       // 📊 Classificações
       let classificacoes: Record<number, number> = {};
 
-      if (cargoFuncao) {
+      if (cargoFuncao || cotaRacial) {
         const classificacaoQuery = this.inscricaoEducacaoRepository
           .createQueryBuilder('inscricao')
           .select([
@@ -235,12 +231,22 @@ export class InscricaoEducacaoService {
             'inscricao.possuiEnsinoSuperior',
             'inscricao.escolaridade',
             'inscricao.quantidadeEspecilizacao',
+            'inscricao.possuiCursoAreaEducacao',
+            'inscricao.possuiEspecializacao',
+            'inscricao.possuiMestrado',
+            'inscricao.possuiDoutorado',
           ])
           .addSelect(
-            `EXTRACT(YEAR FROM AGE(CURRENT_DATE, TO_DATE(inscricao.dataNascimento, 'YYYY-MM-DD')))`,
-            'idade'
-          )
-          .where('inscricao.cargoFuncao = :cargoFuncao', { cargoFuncao });
+            `EXTRACT(YEAR FROM AGE(CURRENT_DATE, TO_DATE(inscricao.dataNascimento, 'YYYY-MM-DD')))` as 'idade'
+          );
+
+        if (cargoFuncao) {
+          classificacaoQuery.andWhere('inscricao.cargoFuncao = :cargoFuncao', { cargoFuncao });
+        }
+
+        if (cotaRacial) {
+          classificacaoQuery.andWhere('inscricao.cotaRacial = :cotaRacial', { cotaRacial });
+        }
 
         const rawResult = await classificacaoQuery.getRawMany();
 
