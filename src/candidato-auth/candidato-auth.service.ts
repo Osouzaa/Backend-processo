@@ -20,10 +20,6 @@ export class CandidatoAuthService {
   async register(dto: RegisterCandidatoDTO) {
     const existing = await this.candidatoRepo.findOne({ where: { cpf: dto.cpf } });
 
-    if (!existing) {
-      throw new NotFoundException('Candidato nao encontrado');
-    }
-
     if (existing) {
       throw new ConflictException('Candidato já cadastrado!');
     }
@@ -53,7 +49,7 @@ export class CandidatoAuthService {
     const candidato = await this.candidatoRepo.findOne({ where: { cpf } });
 
     if (!candidato) {
-      throw new UnauthorizedException('CPF não encontrado. Verifique se o link está correto ou cadastre-se.');
+      throw new NotFoundException('Candidato nao encontrado');
     }
 
     if (candidato.verificado) {
