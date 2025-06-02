@@ -53,12 +53,14 @@ export class MailerService {
 
 
     try {
+      const emailValido = email.trim().toLowerCase();
       await this.transporter.sendMail({
-        from: `"Prefeitura de Ibirité" <${env.EMAIL_FROM}>`,
-        to: email,
-        subject: 'Código de Verificação',
+        from: `"Prefeitura de Ibirité" <noreplypsseduc@ibirite.mg.gov.br>`,
+        to: emailValido,
+        subject: "Código de Verificação - Processo Seletivo",
         html,
       });
+      this.logger.log(`Email enviado para ${email}`);
     } catch (error) {
       this.logger.error(`Erro ao enviar e-mail de verificação para ${email}`, error.message);
       throw new BadRequestException('Não foi possível enviar o e-mail de verificação.');
