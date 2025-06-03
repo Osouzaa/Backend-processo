@@ -252,90 +252,78 @@ export class InscricaoEducacaoService {
     const workbook = new ExcelJs.Workbook();
     const worksheet = workbook.addWorksheet('Inscrições');
 
-    // Descobrir quantos arquivos no máximo tem entre as inscrições
-    const maxArquivos = Math.max(...inscricoes.map(i => i.files?.length ?? 0));
-
-    const headersBase = [
-      'ID', 'Criado em', 'Atualizado em', 'Nome Completo', 'Pontuação', 'Escolaridade', 'Data de Nascimento',
-      'RG', 'CPF', 'Link CPF', 'Gênero', 'Email', 'Certificado Reservista', 'Link Certificado Reservista',
-      'Nacionalidade', 'Naturalidade', 'Estado Civil', 'PCD', 'Laudo PCD', 'Vaga Destinada a PCD',
-      'Cargo/Função', 'Telefone Fixo', 'Celular', 'CEP', 'Logradouro', 'Complemento', 'Número',
-      'Bairro', 'Cidade', 'Estado', 'Comprovante Endereço Link',
-      'Ensino Fundamental', 'Ensino Médio', 'Ensino Superior', 'Qtde Ensino Superior',
-      'Curso Área Educação', 'Qtde Curso Área Educação',
-      'Doutorado', 'Mestrado', 'Especialização', 'Qtde Especialização',
-      'Tempo de Experiência',
+    const headers = [
+      'ID', 'Data de Inscrição', 'Número da Inscrição', 'Nome Completo', 'CPF', 'Vaga de Inscrição',
     ];
 
-    const headersArquivos = Array.from({ length: maxArquivos }, (_, i) => `Arquivo ${i + 1}`);
+    // Adiciona o cabeçalho
+    const headerRow = worksheet.addRow(headers);
 
-    const headers = [...headersBase, ...headersArquivos];
+    // Estiliza o cabeçalho
+    headerRow.eachCell((cell) => {
+      cell.font = { bold: true, color: { argb: 'FFFFFFFF' } };
+      cell.fill = {
+        type: 'pattern',
+        pattern: 'solid',
+        fgColor: { argb: 'FF851F2C' }, // cor vinho escuro da Tecnocar
+      };
+      cell.alignment = { vertical: 'middle', horizontal: 'center' };
+      cell.border = {
+        top: { style: 'thin' },
+        left: { style: 'thin' },
+        bottom: { style: 'thin' },
+        right: { style: 'thin' },
+      };
+    });
 
-    worksheet.addRow(headers);
-
-    // Congelar o cabeçalho
     worksheet.views = [{ state: 'frozen', ySplit: 1 }];
+    worksheet.getRow(1).height = 25;
 
-    inscricoes.forEach(inscricao => {
-      const arquivos = inscricao.files?.map(file => file.path) ?? [];
+    // Adiciona as linhas de dados
+    inscricoes.forEach((inscricao, index) => {
       const linha = [
         inscricao.id,
         this.formatDate(inscricao.criadoEm),
-        this.formatDate(inscricao.atualizadoEm),
+        inscricao.numeroInscricao,
         inscricao.nomeCompleto,
-        inscricao.pontuacao ?? '',
-        inscricao.escolaridade ?? '',
-        this.formatDate(inscricao.dataNascimento),
-        inscricao.rg ?? '',
-        inscricao.cpf,
-        inscricao.cpfLink,
-        inscricao.genero,
-        inscricao.email ?? '',
-        inscricao.certificadoReservista ?? '',
-        inscricao.certificadoReservistaLink ?? '',
-        inscricao.nacionalidade,
-        inscricao.naturalidade,
-        inscricao.estadoCivil,
-        inscricao.pcd ?? '',
-        inscricao.laudoPcd ?? '',
-        inscricao.vagaDestinadaAPCD ?? '',
+        this.maskCpf(inscricao.cpf),
         inscricao.cargoFuncao,
-        inscricao.contatoTelefoneFixo ?? '',
-        inscricao.contatoCelular ?? '',
-        inscricao.cep,
-        inscricao.logradouro,
-        inscricao.complemento ?? '',
-        inscricao.numero,
-        inscricao.bairro,
-        inscricao.cidade,
-        inscricao.estado,
-        inscricao.comprovanteEnderecoLink,
-        inscricao.possuiEnsinoFundamental ?? '',
-        inscricao.possuiEnsinoMedio ?? '',
-        inscricao.possuiEnsinoSuperior ?? '',
-        inscricao.quantidadeEnsinoSuperior ?? '',
-        inscricao.possuiCursoAreaEducacao ?? '',
-        inscricao.quantidadeCursoAreaEducacao ?? '',
-        inscricao.possuiDoutorado ?? '',
-        inscricao.possuiMestrado ?? '',
-        inscricao.possuiEspecializacao ?? '',
-        inscricao.quantidadeEspecilizacao ?? '',
-        inscricao.tempoExperiencia ?? '',
-        ...arquivos,
       ];
 
-      worksheet.addRow(linha);
+      const row = worksheet.addRow(linha);
+
+      // Estilo zebra: cor de fundo alternada
+      const fillColor = index % 2 === 0 ? 'FFFFFFFF' : 'FFF5F5F5';
+
+      row.eachCell((cell) => {
+        cell.fill = {
+          type: 'pattern',
+          pattern: 'solid',
+          fgColor: { argb: fillColor },
+        };
+        cell.border = {
+          top: { style: 'thin' },
+          left: { style: 'thin' },
+          bottom: { style: 'thin' },
+          right: { style: 'thin' },
+        };
+        cell.alignment = { vertical: 'middle', horizontal: 'left' };
+      });
     });
 
     worksheet.columns.forEach((column, index) => {
       column.width = headers[index].length < 20 ? headers[index].length + 5 : 25;
-      column.alignment = { vertical: 'middle', horizontal: 'left' };
     });
 
     const buffer = await workbook.xlsx.writeBuffer();
     return Buffer.from(buffer);
   }
+  private maskCpf(cpf: string): string {
+    const digits = cpf.replace(/\D/g, '');
+    if (digits.length !== 11) return cpf;
 
+    return `${digits.slice(0, 3)}*****${digits.slice(9, 11)}`;
+  }
   private formatDate(date: Date | string | null): string {
     if (!date) return '';
     const d = new Date(date);
