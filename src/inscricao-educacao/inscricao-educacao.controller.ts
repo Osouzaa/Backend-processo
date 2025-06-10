@@ -48,9 +48,9 @@ export class InscricaoEducacaoController {
   }
 
   @UseGuards(AuthGuard)
-  @Get('export')
-  async exportToExel(@Res() res: Response) {
-    const buffer = await this.inscricaoEducacaoService.exportToExcel();
+  @Post('export')
+  async exportToExcelFromBody(@Body() data: any[], @Res() res: Response) {
+    const buffer = await this.inscricaoEducacaoService.exportArrayToExcel(data);
 
     res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
     res.setHeader('Content-Disposition', 'attachment; filename=inscricao_educacao.xlsx');

@@ -246,26 +246,21 @@ export class InscricaoEducacaoService {
     return idade;
   }
 
-  async exportToExcel(): Promise<Uint8Array> {
-    const inscricoes = await this.inscricaoEducacaoRepository.find({ relations: ['files'] });
-
+  async exportArrayToExcel(data: any[]): Promise<Uint8Array> {
     const workbook = new ExcelJs.Workbook();
     const worksheet = workbook.addWorksheet('Inscrições');
 
     const headers = [
-      'ID', 'Data de Inscrição', 'Número da Inscrição', 'Nome Completo', 'CPF', 'Vaga de Inscrição',
+      'ID', 'Classificação', 'Data de Inscrição', 'Número da Inscrição', 'Nome Completo', 'CPF', 'Vaga de Inscrição',
     ];
 
-    // Adiciona o cabeçalho
     const headerRow = worksheet.addRow(headers);
-
-    // Estiliza o cabeçalho
     headerRow.eachCell((cell) => {
       cell.font = { bold: true, color: { argb: 'FFFFFFFF' } };
       cell.fill = {
         type: 'pattern',
         pattern: 'solid',
-        fgColor: { argb: 'FF851F2C' }, // cor vinho escuro da Tecnocar
+        fgColor: { argb: 'FF851F2C' },
       };
       cell.alignment = { vertical: 'middle', horizontal: 'center' };
       cell.border = {
@@ -279,10 +274,10 @@ export class InscricaoEducacaoService {
     worksheet.views = [{ state: 'frozen', ySplit: 1 }];
     worksheet.getRow(1).height = 25;
 
-    // Adiciona as linhas de dados
-    inscricoes.forEach((inscricao, index) => {
+    data.forEach((inscricao, index) => {
       const linha = [
         inscricao.id,
+        inscricao.classificacao,
         this.formatDate(inscricao.criadoEm),
         inscricao.numeroInscricao,
         inscricao.nomeCompleto,
@@ -292,9 +287,7 @@ export class InscricaoEducacaoService {
 
       const row = worksheet.addRow(linha);
 
-      // Estilo zebra: cor de fundo alternada
       const fillColor = index % 2 === 0 ? 'FFFFFFFF' : 'FFF5F5F5';
-
       row.eachCell((cell) => {
         cell.fill = {
           type: 'pattern',
