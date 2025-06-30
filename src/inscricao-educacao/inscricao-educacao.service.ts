@@ -47,6 +47,7 @@ export class InscricaoEducacaoService {
       throw new ConflictException('Candidato não cadastrado!');
     }
 
+
     // Função para gerar número único da inscrição
     const gerarNumeroInscricao = (): string => {
       const ano = new Date().getFullYear().toString().slice(-2); // Ex: "25"
@@ -63,8 +64,8 @@ export class InscricaoEducacaoService {
         .replace(/[^\w\s]/gi, '');
 
     // Pasta base do candidato, sempre a mesma
-    const nomeSanitizado = sanitize(dto.nomeCompleto);
-    const cpfSanitizado = dto.cpf.replace(/\D/g, '');
+    const nomeSanitizado = sanitize(candidateRegistered.nome);
+    const cpfSanitizado = candidateRegistered.cpf.replace(/\D/g, '');
     const userFolder = `${nomeSanitizado}_${cpfSanitizado}`;
     const userDir = path.join(__dirname, '../../uploads', userFolder);
 
@@ -105,10 +106,13 @@ export class InscricaoEducacaoService {
 
     // Calcula pontuação baseado nos dados da inscrição (presumo que essa função existe)
     const pontuacaoCalculada = calcularPontuacao(dto);
-
     // Cria a nova inscrição com dados + caminhos dos arquivos
     const novaInscricao = this.inscricaoEducacaoRepository.create({
       ...dto,
+      nomeCompleto: candidateRegistered.nome,
+      cpf: candidateRegistered.cpf,
+      email: candidateRegistered.email,
+      contatoCelular: candidateRegistered.celular,
       pontuacao: pontuacaoCalculada,
       cpfLink: savedFiles['cpfLink'],
       comprovanteEnderecoLink: savedFiles['comprovanteEnderecoLink'],

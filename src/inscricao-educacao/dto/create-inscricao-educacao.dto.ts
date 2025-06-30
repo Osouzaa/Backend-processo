@@ -4,10 +4,6 @@ import { IsNotEmpty, IsOptional, IsBoolean, IsString, IsNumber } from 'class-val
 export class CreateInscricaoEducacaoDto {
   @IsNotEmpty()
   @IsString()
-  nomeCompleto: string;
-
-  @IsNotEmpty()
-  @IsString()
   dataNascimento: string;
 
   @IsNotEmpty()
@@ -20,19 +16,7 @@ export class CreateInscricaoEducacaoDto {
 
   @IsNotEmpty()
   @IsString()
-  cpf: string;
-
-  // @IsString()
-  // @IsOptional()
-  // cpfLink: string;
-
-  @IsNotEmpty()
-  @IsString()
   genero: string;
-
-  @IsNotEmpty()
-  @IsString()
-  email: string;
 
   @IsOptional()
   @IsString()
@@ -47,7 +31,7 @@ export class CreateInscricaoEducacaoDto {
   naturalidade: string;
 
   @IsOptional()
-  @IsString() 
+  @IsString()
   cidadeNaturalidade: string;
 
   @IsOptional()
@@ -61,10 +45,6 @@ export class CreateInscricaoEducacaoDto {
   @IsOptional()
   @IsString()
   contatoTelefoneFixo: string;
-
-  @IsNotEmpty()
-  @IsString()
-  contatoCelular: string;
 
   @IsOptional()
   @IsString()
@@ -80,7 +60,7 @@ export class CreateInscricaoEducacaoDto {
 
   @IsString()
   @IsOptional()
-  cotaRacial: string; 
+  cotaRacial: string;
 
   // Endereço
 
