@@ -17,7 +17,7 @@ export function calcularPontosEducacao(item: DadosEducacaoSimplificado, escolari
     if (item.possuiEnsinoSuperior === 'true') pontos += 10;
   }
 
-  if (escolaridade === "Médio") {
+  if (escolaridade === "Medio") {
     if (item.possuiEnsinoSuperior === 'true') pontos += 10;
     if (item.possuiCursoAreaEducacao === 'true') pontos += 10;
   }
