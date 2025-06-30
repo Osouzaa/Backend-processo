@@ -239,4 +239,67 @@ export class FilesService {
       files: savedFiles,
     };
   }
+
+  async updateFile(fileId: number, newFile: Express.Multer.File) {
+    const fileEntity = await this.filesRepository.findOne({
+      where: { id: fileId },
+      relations: ['inscricao'],
+    });
+
+    if (!fileEntity) {
+      throw new NotFoundException('Arquivo não encontrado');
+    }
+
+    const baseUploadsPath = path.join(__dirname, '../../uploads');
+
+    // Extrai o caminho relativo a partir da URL pública armazenada
+    const relativePath = fileEntity.path.replace(this.BASE_URL + '/', '');
+
+    const oldFilePath = path.join(baseUploadsPath, relativePath);
+
+    // Apaga arquivo antigo se existir
+    if (fs.existsSync(oldFilePath)) {
+      fs.unlinkSync(oldFilePath);
+    }
+
+    // Salva arquivo novo no mesmo local com o mesmo nome
+    fs.writeFileSync(oldFilePath, newFile.buffer);
+
+    // Se quiser atualizar a data ou outro campo, pode fazer aqui
+
+    // Salva a entidade (mesmo path, mas salva para manter sincronizado se alterar algo)
+    const updatedFile = await this.filesRepository.save(fileEntity);
+
+    return {
+      message: 'Arquivo atualizado com sucesso',
+      file: updatedFile,
+    };
+  }
+
+  async deleteFile(fileId: number) {
+    // Busca o arquivo no banco, incluindo a inscrição para pegar dados do caminho
+    const file = await this.filesRepository.findOne({
+      where: { id: fileId },
+      relations: ['inscricao'],
+    });
+
+    if (!file) {
+      throw new NotFoundException('Arquivo não encontrado');
+    }
+
+    // Monta o caminho completo do arquivo no disco
+    const baseUploadsPath = path.join(__dirname, '../../uploads');
+    const relativePath = file.path.replace(this.BASE_URL + '/', '');
+    const fullFilePath = path.join(baseUploadsPath, relativePath);
+
+    // Apaga arquivo do disco se existir
+    if (fs.existsSync(fullFilePath)) {
+      fs.unlinkSync(fullFilePath);
+    }
+
+    // Remove o registro do banco
+    await this.filesRepository.delete(fileId);
+
+    return { message: 'Arquivo removido com sucesso' };
+  }
 }

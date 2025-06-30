@@ -1,4 +1,4 @@
-import { Body, Controller, Post, UploadedFile, UploadedFiles, UseInterceptors } from "@nestjs/common";
+import { Body, Controller, Delete, Param, Post, Put, UploadedFile, UploadedFiles, UseInterceptors } from "@nestjs/common";
 import { FileInterceptor, FilesInterceptor } from "@nestjs/platform-express";
 import { CreateFileDto } from "./dto/create.file.dto";
 import { FilesService } from "./files.service";
@@ -15,7 +15,6 @@ export class FilesController {
   ) {
     return this.fileService.create(createFileDTO, files);
   }
-
 
   @Post('graduacao')
   @UseInterceptors(FilesInterceptor('files', 2))
@@ -70,6 +69,21 @@ export class FilesController {
   ) {
     return this.fileService.uploadExperienciasProfissionais(createFileDTO, files);
   }
+
+  @Put(':id')
+  @UseInterceptors(FileInterceptor('file'))
+  async updateFile(
+    @Param('id') id: string,
+    @UploadedFile() file: Express.Multer.File,
+  ) {
+    return this.fileService.updateFile(+id, file);
+  }
+
+  @Delete(':id')
+  async deleteFile(@Param('id') id: string) {
+    return this.fileService.deleteFile(+id);
+  }
+
 
 
 
