@@ -99,6 +99,7 @@ export class CandidatoAuthService {
     const payload = {
       sub: candidato.id,
       email: candidato.email,
+      name: candidato.nome,
       role: 'candidato',
     };
 
