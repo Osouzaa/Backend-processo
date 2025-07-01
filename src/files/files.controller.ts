@@ -80,6 +80,15 @@ export class FilesController {
     return this.fileService.uploadExperienciasProfissionais(createFileDTO, files);
   }
 
+  @Post('upload-experiencias-oneFile')
+  @UseInterceptors(FileInterceptor('file'))
+  uploadExperienciasOneFile(
+    @UploadedFile() file: Express.Multer.File,
+    @Body() createFileDTO: CreateFileDto,
+  ) {
+    return this.fileService.uploadExperienciasProfissionais(createFileDTO, [file]);
+  }
+
   @Put(':id')
   @UseInterceptors(FileInterceptor('file'))
   async updateFile(

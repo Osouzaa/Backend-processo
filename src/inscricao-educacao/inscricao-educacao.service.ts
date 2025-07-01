@@ -383,7 +383,16 @@ export class InscricaoEducacaoService {
     return `A inscrição #${id} foi atualizada com sucesso.`;
   }
 
-  remove(id: number) {
-    return `Esta ação remove a inscrição #${id}`;
+  async remove(id: number) {
+    const inscricao = await this.inscricaoEducacaoRepository.findOne({
+      where: {
+        id
+      }
+    })
+    if (!inscricao) {
+      throw new NotFoundException('Inscrição nao encontrada');
+    }
+
+    await this.inscricaoEducacaoRepository.remove(inscricao);
   }
 }
