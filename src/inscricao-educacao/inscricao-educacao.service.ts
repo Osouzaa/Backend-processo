@@ -154,9 +154,10 @@ export class InscricaoEducacaoService {
         cotaRacial,
         pcd,
         page = 1,
+        limit
       } = query;
 
-      const take = 20;
+      const take = limit ||  20;
       const skip = (page - 1) * take;
 
       const qb = this.inscricaoEducacaoRepository.createQueryBuilder('inscricao');
@@ -251,7 +252,7 @@ export class InscricaoEducacaoService {
     const worksheet = workbook.addWorksheet('Inscrições');
 
     const headers = [
-      'ID', 'Classificação', 'Data de Inscrição', 'Número da Inscrição', 'Nome Completo', 'CPF', 'Vaga de Inscrição',
+      'ID', 'Classificação', 'Data de Inscrição', 'Número da Inscrição', 'Nome Completo', 'CPF', 'Vaga de Inscrição', 'Pontuação', 'Total de dias', 'PTS Educação',
     ];
 
     const headerRow = worksheet.addRow(headers);
@@ -283,6 +284,9 @@ export class InscricaoEducacaoService {
         inscricao.nomeCompleto,
         this.maskCpf(inscricao.cpf),
         inscricao.cargoFuncao,
+        inscricao.pontuacao,
+        inscricao.totalDeDias,
+        inscricao.pontosEducacao
       ];
 
       const row = worksheet.addRow(linha);

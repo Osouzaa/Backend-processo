@@ -1,4 +1,4 @@
-import { IsOptional, IsString } from "class-validator";
+import { IsNumber, IsOptional, IsString } from "class-validator";
 
 export class QueryInscricaoEducacaoDto {
 
@@ -26,6 +26,11 @@ export class QueryInscricaoEducacaoDto {
     @IsOptional()
   @IsString()
   pcd: string;
+
+
+  @IsOptional()
+  @IsNumber()
+  limit: number;
 
 
 
