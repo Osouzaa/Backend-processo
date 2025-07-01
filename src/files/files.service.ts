@@ -11,8 +11,7 @@ import { env } from 'src/env';
 @Injectable()
 export class FilesService {
   private readonly logger = new Logger(FilesService.name);
-
-  private readonly BASE_URL = env.BASE_URL; // Altere aqui para seu IP ou domínio
+  private readonly BASE_URL = env.BASE_URL;
 
   constructor(
     @InjectRepository(File)
@@ -42,201 +41,100 @@ export class FilesService {
     if (!inscricao) throw new Error("Inscrição não encontrada!");
 
     const { userDir, publicPathPrefix } = this.getUserDirInfo(inscricao.nomeCompleto, inscricao.cpf);
+    const savedFiles: File[] = [];
 
-    const tipos = ['frente', 'verso'];
-
-    files.forEach(async (file, index) => {
-      const tipo = tipos[index] || `extra${index}`;
-      const fileName = `Ensino-medio-${tipo}.pdf`;
+    for (const file of files) {
+      const fileName = file.originalname;
       const filePath = path.join(userDir, fileName);
-      const savedFiles: File[] = [];
       fs.writeFileSync(filePath, file.buffer);
 
       const newFile = this.filesRepository.create({
         fileName,
         path: `${publicPathPrefix}/${fileName}`,
-        inscricao: inscricao,
+        inscricao,
       });
 
       const savedFile = await this.filesRepository.save(newFile);
       savedFiles.push(savedFile);
-    });
+    }
 
     return {
       message: "Arquivos salvos com sucesso!",
+      files: savedFiles,
     };
   }
 
   async createUploadGraduacao(dto: CreateFileDto, files: Express.Multer.File[]) {
-    const inscricao = await this.inscricaoService.findOne(+dto.inscricaoId);
-    if (!inscricao) throw new Error("Inscrição não encontrada!");
-
-    const { userDir, publicPathPrefix } = this.getUserDirInfo(inscricao.nomeCompleto, inscricao.cpf);
-
-    const tipos = ['frente', 'verso'];
-
-    files.forEach(async (file, index) => {
-      const tipo = tipos[index] || `extra${index}`;
-      const fileName = `Ensino-superior-${tipo}.pdf`;
-      const filePath = path.join(userDir, fileName);
-      const savedFiles: File[] = [];
-      fs.writeFileSync(filePath, file.buffer);
-
-      const newFile = this.filesRepository.create({
-        fileName,
-        path: `${publicPathPrefix}/${fileName}`,
-        inscricao: inscricao,
-      });
-
-      const savedFile = await this.filesRepository.save(newFile);
-      savedFiles.push(savedFile);
-    });
-
-    return { message: "Arquivos salvos com sucesso!" };
+    return this.create(dto, files);
   }
 
   async createUploadDoutorado(dto: CreateFileDto, files: Express.Multer.File[]) {
-    const inscricao = await this.inscricaoService.findOne(+dto.inscricaoId);
-    if (!inscricao) throw new Error("Inscrição não encontrada!");
-
-    const { userDir, publicPathPrefix } = this.getUserDirInfo(inscricao.nomeCompleto, inscricao.cpf);
-
-    const tipos = ['frente', 'verso'];
-
-    files.forEach(async (file, index) => {
-      const tipo = tipos[index] || `extra${index}`;
-      const fileName = `Doutorado-${tipo}.pdf`;
-      const filePath = path.join(userDir, fileName);
-      const savedFiles: File[] = [];
-      fs.writeFileSync(filePath, file.buffer);
-
-      const newFile = this.filesRepository.create({
-        fileName,
-        path: `${publicPathPrefix}/${fileName}`,
-        inscricao: inscricao,
-      });
-
-      const savedFile = await this.filesRepository.save(newFile);
-      savedFiles.push(savedFile);
-    });
+    return this.create(dto, files);
   }
 
   async uploadCursoEducacao(dto: CreateFileDto, files: Express.Multer.File[]) {
-    const inscricao = await this.inscricaoService.findOne(+dto.inscricaoId);
-    if (!inscricao) throw new Error("Inscrição não encontrada!");
-
-    const { userDir, publicPathPrefix } = this.getUserDirInfo(inscricao.nomeCompleto, inscricao.cpf);
-
-    const tipos = ['frente', 'verso'];
-
-    files.forEach(async (file, index) => {
-      const tipo = tipos[index] || `extra${index}`;
-      const fileName = `Curso-educacao-${tipo}.pdf`;
-      const filePath = path.join(userDir, fileName);
-      const savedFiles: File[] = [];
-      fs.writeFileSync(filePath, file.buffer);
-
-      const newFile = this.filesRepository.create({
-        fileName,
-        path: `${publicPathPrefix}/${fileName}`,
-        inscricao: inscricao,
-      });
-
-      const savedFile = await this.filesRepository.save(newFile);
-      savedFiles.push(savedFile);
-    });
+    return this.create(dto, files);
   }
 
   async uploadMestrado(dto: CreateFileDto, files: Express.Multer.File[]) {
-    const inscricao = await this.inscricaoService.findOne(+dto.inscricaoId);
-    if (!inscricao) throw new Error("Inscrição não encontrada!");
-
-    const { userDir, publicPathPrefix } = this.getUserDirInfo(inscricao.nomeCompleto, inscricao.cpf);
-
-    const savedFiles: File[] = [];
-
-    for (const file of files) {
-      const fileSuffix = file.originalname.toLowerCase().includes('verso') ? 'verso' : 'frente';
-      const fileName = `mestrado-${fileSuffix}.pdf`;
-      const filePath = path.join(userDir, fileName);
-
-      fs.writeFileSync(filePath, file.buffer);
-
-      const newFile = this.filesRepository.create({
-        fileName,
-        path: `${publicPathPrefix}/${fileName}`,
-        inscricao: inscricao,
-      });
-
-      const savedFile = await this.filesRepository.save(newFile);
-      savedFiles.push(savedFile);
-    }
-
-    return {
-      message: "Arquivos salvos com sucesso!",
-      files: savedFiles,
-    };
+    return this.create(dto, files);
   }
 
   async uploadEspecializacao(dto: CreateFileDto, files: Express.Multer.File[]) {
-    const inscricao = await this.inscricaoService.findOne(+dto.inscricaoId);
-    if (!inscricao) throw new NotFoundException("Inscrição não encontrada!");
-
-    const { userDir, publicPathPrefix } = this.getUserDirInfo(inscricao.nomeCompleto, inscricao.cpf);
-
-    const savedFiles: File[] = [];
-
-    for (let i = 0; i < files.length; i++) {
-      const file = files[i];
-      const fileName = `Comprovante de Especialização-${i + 1}.pdf`;
-      const filePath = path.join(userDir, fileName);
-
-      fs.writeFileSync(filePath, file.buffer);
-
-      const newFile = this.filesRepository.create({
-        fileName,
-        path: `${publicPathPrefix}/${fileName}`,
-        inscricao: inscricao,
-      });
-
-      const savedFile = await this.filesRepository.save(newFile);
-      savedFiles.push(savedFile);
-    }
-
-    return {
-      message: "Comprovantes de especialização salvos com sucesso!",
-      files: savedFiles,
-    };
+    return this.create(dto, files);
   }
 
   async uploadExperienciasProfissionais(dto: CreateFileDto, files: Express.Multer.File[]) {
-    const inscricao = await this.inscricaoService.findOne(+dto.inscricaoId);
-    if (!inscricao) throw new Error("Inscrição não encontrada!");
+    return this.create(dto, files);
+  }
 
-    const { userDir, publicPathPrefix } = this.getUserDirInfo(inscricao.nomeCompleto, inscricao.cpf);
+  async updateFile(fileId: number, newFile: Express.Multer.File) {
+    const fileEntity = await this.filesRepository.findOne({
+      where: { id: fileId },
+      relations: ['inscricao'],
+    });
 
-    const savedFiles: File[] = [];
-
-    for (let i = 0; i < files.length; i++) {
-      const file = files[i];
-      const fileName = `Comprovante de Experiência-${i + 1}.pdf`;
-      const filePath = path.join(userDir, fileName);
-
-      fs.writeFileSync(filePath, file.buffer);
-
-      const newFile = this.filesRepository.create({
-        fileName,
-        path: `${publicPathPrefix}/${fileName}`,
-        inscricao: inscricao,
-      });
-
-      const savedFile = await this.filesRepository.save(newFile);
-      savedFiles.push(savedFile);
+    if (!fileEntity) {
+      throw new NotFoundException('Arquivo não encontrado');
     }
 
+    const baseUploadsPath = path.join(__dirname, '../../uploads');
+    const relativePath = fileEntity.path.replace(this.BASE_URL + '/', '');
+    const oldFilePath = path.join(baseUploadsPath, relativePath);
+
+    if (fs.existsSync(oldFilePath)) {
+      fs.unlinkSync(oldFilePath);
+    }
+
+    fs.writeFileSync(oldFilePath, newFile.buffer);
+    const updatedFile = await this.filesRepository.save(fileEntity);
+
     return {
-      message: "Comprovantes de experiência salvos com sucesso!",
-      files: savedFiles,
+      message: 'Arquivo atualizado com sucesso',
+      file: updatedFile,
     };
+  }
+
+  async deleteFile(fileId: number) {
+    const file = await this.filesRepository.findOne({
+      where: { id: fileId },
+      relations: ['inscricao'],
+    });
+
+    if (!file) {
+      throw new NotFoundException('Arquivo não encontrado');
+    }
+
+    const baseUploadsPath = path.join(__dirname, '../../uploads');
+    const relativePath = file.path.replace(this.BASE_URL + '/', '');
+    const fullFilePath = path.join(baseUploadsPath, relativePath);
+
+    if (fs.existsSync(fullFilePath)) {
+      fs.unlinkSync(fullFilePath);
+    }
+
+    await this.filesRepository.delete(fileId);
+
+    return { message: 'Arquivo removido com sucesso' };
   }
 }

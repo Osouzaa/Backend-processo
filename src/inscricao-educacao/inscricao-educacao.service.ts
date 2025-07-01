@@ -34,102 +34,99 @@ export class InscricaoEducacaoService {
       comprovanteEnderecoLink?: Express.Multer.File[];
       certificadoReservistaLink?: Express.Multer.File[];
       laudoPcd?: Express.Multer.File[];
-      cotaRacialLink?: Express.Multer.File[]
+      cotaRacialLink?: Express.Multer.File[];
     },
     user: CurrentUser
   ) {
-
+    // Verifica se candidato está cadastrado
     const candidateRegistered = await this.candidatoRepo.findOne({
-      where: {
-        id: user.sub
-      }
-    })
+      where: { id: user.sub },
+    });
 
     if (!candidateRegistered) {
-      throw new ConflictException('Candidato nao cadastrado!');
+      throw new ConflictException('Candidato não cadastrado!');
     }
+
+
+    // Função para gerar número único da inscrição
     const gerarNumeroInscricao = (): string => {
-      const ano = new Date().getFullYear().toString().slice(-2); // Ex: "25" para 2025
-      const random = Math.floor(100000 + Math.random() * 900000); // número entre 100000 e 999999
+      const ano = new Date().getFullYear().toString().slice(-2); // Ex: "25"
+      const random = Math.floor(100000 + Math.random() * 900000); // 6 dígitos aleatórios
       return `EDU-${ano}-${random}`;
     };
 
-    // Função de sanitização
-    function sanitize(str: string): string {
-      return str.normalize("NFD")
-        .replace(/[\u0300-\u036f]/g, "")
-        .replace(/\s+/g, "_")
-        .replace(/[^\w\s]/gi, "");
-    }
+    // Função para sanitizar strings (remover acentos, espaços, caracteres especiais)
+    const sanitize = (str: string) =>
+      str
+        .normalize('NFD')
+        .replace(/[\u0300-\u036f]/g, '')
+        .replace(/\s+/g, '_')
+        .replace(/[^\w\s]/gi, '');
 
-    const nomeSanitizado = sanitize(dto.nomeCompleto);
-    const cpfSanitizado = dto.cpf.replace(/\D/g, "");
+    // Pasta base do candidato, sempre a mesma
+    const nomeSanitizado = sanitize(candidateRegistered.nome);
+    const cpfSanitizado = candidateRegistered.cpf.replace(/\D/g, '');
     const userFolder = `${nomeSanitizado}_${cpfSanitizado}`;
     const userDir = path.join(__dirname, '../../uploads', userFolder);
 
+    // Cria pasta se não existir (reusa se existir)
     if (!fs.existsSync(userDir)) {
       fs.mkdirSync(userDir, { recursive: true });
     }
 
+    // Função para salvar arquivo, sobrescrevendo se já existir
+    const saveFile = (file: Express.Multer.File, fileName: string) => {
+      const filePath = path.join(userDir, fileName);
+      fs.writeFileSync(filePath, file.buffer);
+      return `${this.BASE_URL}/${userFolder}/${fileName}`;
+    };
+
+    // Objeto para armazenar os caminhos dos arquivos salvos
     const savedFiles: { [key: string]: string } = {};
 
     if (files.cpfLink?.length) {
-      const fileName = 'cpf.pdf';
-      const filePath = path.join(userDir, fileName);
-      fs.writeFileSync(filePath, files.cpfLink[0].buffer);
-
-      savedFiles['cpfFile'] = `${this.BASE_URL}/${userFolder}/${fileName}`;
+      savedFiles['cpfLink'] = saveFile(files.cpfLink[0], 'cpf.pdf');
     }
 
-
     if (files.cotaRacialLink?.length) {
-      const fileName = 'Documento de Cota Racial.pdf';
-      const filePath = path.join(userDir, fileName);
-      fs.writeFileSync(filePath, files.cotaRacialLink[0].buffer);
-
-      savedFiles['cotaRacialLink'] = `${this.BASE_URL}/${userFolder}/${fileName}`;
+      savedFiles['cotaRacialLink'] = saveFile(files.cotaRacialLink[0], 'Documento_de_Cota_Racial.pdf');
     }
 
     if (files.comprovanteEnderecoLink?.length) {
-      const fileName = 'comprovante_endereco.pdf';
-      const filePath = path.join(userDir, fileName);
-      fs.writeFileSync(filePath, files.comprovanteEnderecoLink[0].buffer);
-
-      savedFiles['comprovanteEndereco'] = `${this.BASE_URL}/${userFolder}/${fileName}`;
+      savedFiles['comprovanteEnderecoLink'] = saveFile(files.comprovanteEnderecoLink[0], 'comprovante_endereco.pdf');
     }
 
     if (files.certificadoReservistaLink?.length) {
-      const fileName = 'comprovante_reservista.pdf';
-      const filePath = path.join(userDir, fileName);
-      fs.writeFileSync(filePath, files.certificadoReservistaLink[0].buffer);
-
-      savedFiles['comprovanteReservista'] = `${this.BASE_URL}/${userFolder}/${fileName}`;
+      savedFiles['certificadoReservistaLink'] = saveFile(files.certificadoReservistaLink[0], 'comprovante_reservista.pdf');
     }
 
     if (files.laudoPcd?.length) {
-      const fileName = 'comprovante_laudopcd.pdf';
-      const filePath = path.join(userDir, fileName);
-      fs.writeFileSync(filePath, files.laudoPcd[0].buffer);
-
-      savedFiles['comprovante_laudopcd'] = `${this.BASE_URL}/${userFolder}/${fileName}`;
+      savedFiles['laudoPcd'] = saveFile(files.laudoPcd[0], 'comprovante_laudopcd.pdf');
     }
-    const pontuacaoCalculada = calcularPontuacao(dto);
 
+    // Calcula pontuação baseado nos dados da inscrição (presumo que essa função existe)
+    const pontuacaoCalculada = calcularPontuacao(dto);
+    // Cria a nova inscrição com dados + caminhos dos arquivos
     const novaInscricao = this.inscricaoEducacaoRepository.create({
       ...dto,
+      nomeCompleto: candidateRegistered.nome,
+      cpf: candidateRegistered.cpf,
+      email: candidateRegistered.email,
+      contatoCelular: candidateRegistered.celular,
       pontuacao: pontuacaoCalculada,
-      cpfLink: savedFiles['cpfFile'],
-      comprovanteEnderecoLink: savedFiles['comprovanteEndereco'],
-      certificadoReservistaLink: savedFiles['comprovanteReservista'],
-      laudoPcd: savedFiles['comprovante_laudopcd'],
+      cpfLink: savedFiles['cpfLink'],
+      comprovanteEnderecoLink: savedFiles['comprovanteEnderecoLink'],
+      certificadoReservistaLink: savedFiles['certificadoReservistaLink'],
+      laudoPcd: savedFiles['laudoPcd'],
       cotaRacialLink: savedFiles['cotaRacialLink'],
       candidato: candidateRegistered,
       numeroInscricao: gerarNumeroInscricao(),
     });
 
-
+    // Salva no banco
     await this.inscricaoEducacaoRepository.save(novaInscricao);
 
+    // Retorna os dados principais
     return {
       id: novaInscricao.id,
       pontuacao: novaInscricao.pontuacao,
@@ -137,7 +134,7 @@ export class InscricaoEducacaoService {
       nomeCompleto: novaInscricao.nomeCompleto,
       escolaridade: novaInscricao.escolaridade,
       cargoFuncao: novaInscricao.cargoFuncao,
-      dataDoCadastro: novaInscricao.criadoEm
+      dataDoCadastro: novaInscricao.criadoEm,
     };
   }
 
@@ -390,7 +387,16 @@ export class InscricaoEducacaoService {
     return `A inscrição #${id} foi atualizada com sucesso.`;
   }
 
-  remove(id: number) {
-    return `Esta ação remove a inscrição #${id}`;
+  async remove(id: number) {
+    const inscricao = await this.inscricaoEducacaoRepository.findOne({
+      where: {
+        id
+      }
+    })
+    if (!inscricao) {
+      throw new NotFoundException('Inscrição nao encontrada');
+    }
+
+    await this.inscricaoEducacaoRepository.remove(inscricao);
   }
 }

@@ -8,10 +8,8 @@ import helmet from 'helmet';
 import { NestExpressApplication } from '@nestjs/platform-express';
 
 async function bootstrap() {
-
-
+  const start = Date.now();
   const app = await NestFactory.create(AppModule);
-
 
   app.useGlobalPipes(new ValidationPipe());
 
@@ -42,6 +40,9 @@ async function bootstrap() {
   // Inicializando a aplicação
   await app.listen(env.PORT || 3443, '0.0.0.0');
   console.log(`✅ API rodando em: https://apipsseduc.ibirite.mg.gov.br:${env.PORT || 3443}`);
+
+  const duration = Date.now() - start;
+  console.log(`Tempo total de startup: ${duration}ms`);
 }
 
 bootstrap();

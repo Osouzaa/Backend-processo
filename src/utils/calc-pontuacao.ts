@@ -26,7 +26,7 @@ export function calcularPontuacao(dto: Partial<CreateInscricaoEducacaoDto>): num
     pontuacao += calcularPontuacaoExperiencia(diasExperiencia);
   }
 
-  if (dto.escolaridade === "Médio") {
+  if (dto.escolaridade === "Medio") {
     if (dto.possuiEnsinoSuperior === "true") pontuacao += 20;
     if (dto.possuiCursoAreaEducacao === "true") pontuacao += 30;
 
