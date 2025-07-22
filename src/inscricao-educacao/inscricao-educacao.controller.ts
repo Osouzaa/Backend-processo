@@ -56,15 +56,31 @@ export class InscricaoEducacaoController {
   }
 
 
-  @UseGuards(AuthGuard)
-  @Post('export')
-  async exportToExcelFromBody(@Body() data: any[], @Res() res: Response) {
-    const buffer = await this.inscricaoEducacaoService.exportArrayToExcel(data);
 
+  @UseGuards(AuthGuard)
+  @Get('exportar') // Mudamos para 'exportar' e método GET para clareza
+  async exportarExcel(
+    @Query() query: QueryInscricaoEducacaoDto, // Recebe os filtros da URL
+    @Res() res: Response,
+  ) {
+    // 1. Opcional, mas recomendado: remove a paginação dos filtros para garantir que TUDO seja exportado
+    const queryCompleta: any = { ...query };
+    delete queryCompleta.page;
+    delete queryCompleta.limit;
+
+    // 2. O backend busca os dados usando os filtros.
+    //    Nossa função 'findAll' já está preparada para retornar a lista completa quando há 'cargoFuncao'.
+    const resultado = await this.inscricaoEducacaoService.findAll(queryCompleta);
+
+    // 3. Gera o Excel com a lista completa que o próprio backend buscou
+    const buffer = await this.inscricaoEducacaoService.exportArrayToExcel(
+      resultado.data, // Usa a lista completa do resultado
+    );
+
+    // 4. Envia o arquivo como resposta
     res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
     res.setHeader('Content-Disposition', 'attachment; filename=inscricao_educacao.xlsx');
-
-    return res.send(buffer);
+    res.send(buffer);
   }
 
   @Get('download/:id')
