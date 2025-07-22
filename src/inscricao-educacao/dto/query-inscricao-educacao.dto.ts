@@ -22,10 +22,14 @@ export class QueryInscricaoEducacaoDto {
   @IsOptional()
   @IsString()
   cotaRacial: string;
-
-    @IsOptional()
+    
+  @IsOptional()
   @IsString()
   pcd: string;
+
+  @IsOptional()
+  @IsString()
+  status: string;
 
 
   @IsOptional()

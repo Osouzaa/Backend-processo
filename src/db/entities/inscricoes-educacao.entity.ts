@@ -88,7 +88,7 @@ export class InscricaoEducacao {
   @Column()
   cargoFuncao: string;
 
-  @Column({nullable: true})
+  @Column({ nullable: true })
   cotaRacial: string;
 
   // Endereço
@@ -173,9 +173,13 @@ export class InscricaoEducacao {
   @OneToMany(() => File, (file) => file.inscricao, { cascade: true })
   files: File[];
 
-  @Column({nullable: true})
+  @Column({
+    type: 'varchar', 
+    nullable: true,
+    default: 'Não Aprovado'
+  })
   status: string;
 
-  @Column({nullable: true})
+  @Column({ nullable: true })
   obs: string;
 }

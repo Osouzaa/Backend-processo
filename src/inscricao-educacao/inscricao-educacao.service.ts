@@ -151,6 +151,7 @@ export class InscricaoEducacaoService {
       nomeCompleto,
       cotaRacial,
       pcd,
+      status,
       page = 1,
       limit,
     } = query;
@@ -160,7 +161,7 @@ export class InscricaoEducacaoService {
 
     const qb = this.inscricaoEducacaoRepository.createQueryBuilder('inscricao');
 
-    // 🔍 Filtros
+    // 🔍 Filtros de banco de dados
     if (cpf) {
       qb.andWhere(
         "REPLACE(REPLACE(REPLACE(inscricao.cpf, '.', ''), '-', ''), ' ', '') = :cpf",
@@ -173,14 +174,12 @@ export class InscricaoEducacaoService {
     if (cotaRacial) {
       qb.andWhere('inscricao.cotaRacial = :cotaRacial', { cotaRacial });
     }
-   if (pcd) {
-      // Se o filtro for 'Sim', busca todos que não sejam 'Não Possui' ou nulos/vazios
+    if (pcd) {
       if (pcd === 'Sim') {
-        qb.andWhere("inscricao.pcd IS NOT NULL AND inscricao.pcd NOT IN (:...pcdValues)", { 
-          pcdValues: ['Não Possui', ''] 
+        qb.andWhere("inscricao.pcd IS NOT NULL AND inscricao.pcd NOT IN (:...pcdValues)", {
+          pcdValues: ['Não Possui', '']
         });
       } else {
-        // Se for enviado outro valor para pcd, mantém o filtro exato (opcional)
         qb.andWhere('inscricao.pcd = :pcd', { pcd });
       }
     }
@@ -190,69 +189,68 @@ export class InscricaoEducacaoService {
 
     // 🔄 Busca todos os dados filtrados
     const todosDados = await qb.getMany();
+    let dadosFinais = todosDados;
 
-    // 🧠 Adiciona campos auxiliares
-    const dadosComExtras = todosDados.map((item) => {
-      const idade = this.calcularIdade(item.dataNascimento);
-      const pontosEducacao = calcularPontosEducacao(item, item.escolaridade);
-      return {
+    if (cargoFuncao) {
+      const dadosComExtras = todosDados.map((item) => {
+        const idade = this.calcularIdade(item.dataNascimento);
+        const pontosEducacao = calcularPontosEducacao(item, item.escolaridade);
+        return { ...item, idade, pontosEducacao };
+      });
+
+      // ==================================================================
+      // MUDANÇA CRÍTICA: Lógica de ordenação mais robusta
+      // ==================================================================
+      const ordenados = dadosComExtras.sort((a, b) => {
+        // 1. Atribui um peso para cada status para definir a prioridade
+        const getStatusWeight = (status: string | null | undefined) => {
+          if (status === 'Aprovado') return 1;
+          if (status === 'Desclassificado') return 3;
+          return 2; // Pendente, nulo ou qualquer outro status fica no meio
+        };
+
+        const weightA = getStatusWeight(a.status);
+        const weightB = getStatusWeight(b.status);
+
+        // 2. Compara primeiro pelo peso do status
+        if (weightA !== weightB) {
+          return weightA - weightB; // Ordena por prioridade (1, 2, 3)
+        }
+
+        // 3. Se o status for o mesmo, aplica os critérios de desempate
+        if (b.pontuacao !== a.pontuacao) return b.pontuacao - a.pontuacao;
+        
+        const isAIdoso = a.idade >= 60;
+        const isBIdoso = b.idade >= 60;
+        if (isAIdoso !== isBIdoso) return isAIdoso ? -1 : 1;
+        
+        if (b.pontosEducacao !== a.pontosEducacao) return b.pontosEducacao - a.pontosEducacao;
+        if (b.totalDeDias !== a.totalDeDias) return b.totalDeDias - a.totalDeDias;
+        
+        return b.idade - a.idade;
+      });
+
+      const dadosClassificados = ordenados.map((item, index) => ({
         ...item,
-        idade,
-        pontosEducacao,
-      };
-    });
+        classificacao: index + 1,
+      }));
 
-    // 🏁 Ordena com os novos critérios de desempate
-    const ordenados = dadosComExtras.sort((a, b) => {
-      // ==================================================================
-      // NOVO: 1º Critério - Jogar desclassificados para o fim
-      // ==================================================================
-      const aIsDisqualified = a.status === 'Desclassificado';
-      const bIsDisqualified = b.status === 'Desclassificado';
-
-      if (aIsDisqualified !== bIsDisqualified) {
-        // Se 'a' for desclassificado, ele vai para depois de 'b' (retorna 1).
-        // Se 'b' for desclassificado, ele vai para depois de 'a' (retorna -1).
-        return aIsDisqualified ? 1 : -1;
-      }
-
-      // Critérios antigos continuam se não houver diferença no status
-      if (b.pontuacao !== a.pontuacao) return b.pontuacao - a.pontuacao;
-
-      const isAIdoso = a.idade >= 60;
-      const isBIdoso = b.idade >= 60;
-      if (isAIdoso !== isBIdoso) return isAIdoso ? -1 : 1;
-
-      if (b.pontosEducacao !== a.pontosEducacao) return b.pontosEducacao - a.pontosEducacao;
-      if (b.totalDeDias !== a.totalDeDias) return b.totalDeDias - a.totalDeDias;
-      
-      return b.idade - a.idade;
-    });
-
-    // 🎯 Atribui classificação
-    const dadosClassificados = ordenados.map((item, index) => ({
-      ...item,
-      classificacao: index + 1,
-    }));
-
-    // ==================================================================
-    // NOVO: Paginação condicional
-    // ==================================================================
-    let paginatedData = dadosClassificados;
-    let totalPages = 1;
-    let currentPage = 1;
-
-    // Só aplica paginação se NÃO estiver filtrando por um cargo/função específico
-    if (!cargoFuncao) {
-      paginatedData = dadosClassificados.slice(skip, skip + take);
-      totalPages = Math.ceil(dadosClassificados.length / take);
-      currentPage = page;
+      dadosFinais = dadosClassificados;
     }
+
+    if (status) {
+      // Este filtro agora será aplicado em uma lista perfeitamente ordenada
+      dadosFinais = dadosFinais.filter(item => item.status === status);
+    }
+
+    const totalItems = dadosFinais.length;
+    const paginatedData = dadosFinais.slice(skip, skip + take);
+    const totalPages = Math.ceil(totalItems / take);
 
     return {
       data: paginatedData,
-      total: dadosClassificados.length,
-      page: currentPage,
+      total: totalItems,
+      page: page,
       pageCount: totalPages,
     };
   } catch (error) {
