@@ -173,8 +173,16 @@ export class InscricaoEducacaoService {
     if (cotaRacial) {
       qb.andWhere('inscricao.cotaRacial = :cotaRacial', { cotaRacial });
     }
-    if (pcd) {
-      qb.andWhere('inscricao.pcd = :pcd', { pcd });
+   if (pcd) {
+      // Se o filtro for 'Sim', busca todos que não sejam 'Não Possui' ou nulos/vazios
+      if (pcd === 'Sim') {
+        qb.andWhere("inscricao.pcd IS NOT NULL AND inscricao.pcd NOT IN (:...pcdValues)", { 
+          pcdValues: ['Não Possui', ''] 
+        });
+      } else {
+        // Se for enviado outro valor para pcd, mantém o filtro exato (opcional)
+        qb.andWhere('inscricao.pcd = :pcd', { pcd });
+      }
     }
     if (cargoFuncao) {
       qb.andWhere('inscricao.cargoFuncao = :cargoFuncao', { cargoFuncao });
