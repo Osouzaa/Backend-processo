@@ -172,4 +172,10 @@ export class InscricaoEducacao {
 
   @OneToMany(() => File, (file) => file.inscricao, { cascade: true })
   files: File[];
+
+  @Column({nullable: true})
+  status: string;
+
+  @Column({nullable: true})
+  obs: string;
 }

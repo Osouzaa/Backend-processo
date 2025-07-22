@@ -14,6 +14,7 @@ import { Candidato } from 'src/db/entities/candidato.entity';
 import type { CurrentUser } from 'src/decorators/currentUser.decorator';
 import type { UpdateScoreDto } from './dto/update-score.dto';
 import { calcularPontosEducacao } from 'src/utils/calcularPontosEducacao';
+import type { AddAvaliableCandidateDto } from './dto/add-avaliable-candidte.dto';
 @Injectable()
 export class InscricaoEducacaoService {
   private readonly BASE_URL = env.BASE_URL
@@ -142,96 +143,115 @@ export class InscricaoEducacaoService {
     return this.inscricaoEducacaoRepository.findOne({ where: { cpf } });
   }
   async findAll(query: QueryInscricaoEducacaoDto & { page?: number }) {
-    try {
-      const {
-        cpf,
-        escolaridade,
-        cargoFuncao,
-        nomeCompleto,
-        cotaRacial,
-        pcd,
-        page = 1,
-        limit
-      } = query;
+  try {
+    const {
+      cpf,
+      escolaridade,
+      cargoFuncao,
+      nomeCompleto,
+      cotaRacial,
+      pcd,
+      page = 1,
+      limit,
+    } = query;
 
-      const take = limit ||  20;
-      const skip = (page - 1) * take;
+    const take = limit || 20;
+    const skip = (page - 1) * take;
 
-      const qb = this.inscricaoEducacaoRepository.createQueryBuilder('inscricao');
+    const qb = this.inscricaoEducacaoRepository.createQueryBuilder('inscricao');
 
-      // 🔍 Filtros
-      if (cpf) {
-        qb.andWhere(
-          "REPLACE(REPLACE(REPLACE(inscricao.cpf, '.', ''), '-', ''), ' ', '') = :cpf",
-          { cpf: cpf.replace(/\D/g, '') }
-        );
-      }
-
-      if (escolaridade) {
-        qb.andWhere('inscricao.escolaridade = :escolaridade', { escolaridade });
-      }
-
-      if (cotaRacial) {
-        qb.andWhere('inscricao.cotaRacial = :cotaRacial', { cotaRacial });
-      }
-
-      if (pcd) {
-        qb.andWhere('inscricao.pcd = :pcd', { pcd });
-      }
-
-      if (cargoFuncao) {
-        qb.andWhere('inscricao.cargoFuncao = :cargoFuncao', { cargoFuncao });
-      }
-
-      // 🔄 Busca todos os dados filtrados (sem paginação ainda!)
-      const todosDados = await qb.getMany();
-
-      // 🧠 Adiciona campos auxiliares (pontuação, idade, totalDeDias, etc)
-      const dadosComExtras = todosDados.map((item) => {
-        const idade = this.calcularIdade(item.dataNascimento);
-        const pontosEducacao = calcularPontosEducacao(item, item.escolaridade);
-        return {
-          ...item,
-          idade,
-          pontosEducacao,
-        };
-      });
-
-      // 🏁 Ordena com os critérios de desempate
-      const ordenados = dadosComExtras.sort((a, b) => {
-        if (b.pontuacao !== a.pontuacao) return b.pontuacao - a.pontuacao;
-
-        const isAIdoso = a.idade >= 60;
-        const isBIdoso = b.idade >= 60;
-        if (isAIdoso !== isBIdoso) return isAIdoso ? -1 : 1;
-
-        if (b.pontosEducacao !== a.pontosEducacao) return b.pontosEducacao - a.pontosEducacao;
-
-        if (b.totalDeDias !== a.totalDeDias) return b.totalDeDias - a.totalDeDias;
-
-        return b.idade - a.idade;
-      });
-
-      // 🎯 Atribui classificação
-      const dadosClassificados = ordenados.map((item, index) => ({
-        ...item,
-        classificacao: index + 1,
-      }));
-
-      // 📄 Paginação manual
-      const paginados = dadosClassificados.slice(skip, skip + take);
-
-      return {
-        data: paginados,
-        total: dadosClassificados.length,
-        page,
-        pageCount: Math.ceil(dadosClassificados.length / take),
-      };
-    } catch (error) {
-      console.error('Erro ao buscar inscrições:', error);
-      throw new Error('Erro ao buscar inscrições.');
+    // 🔍 Filtros
+    if (cpf) {
+      qb.andWhere(
+        "REPLACE(REPLACE(REPLACE(inscricao.cpf, '.', ''), '-', ''), ' ', '') = :cpf",
+        { cpf: cpf.replace(/\D/g, '') }
+      );
     }
+    if (escolaridade) {
+      qb.andWhere('inscricao.escolaridade = :escolaridade', { escolaridade });
+    }
+    if (cotaRacial) {
+      qb.andWhere('inscricao.cotaRacial = :cotaRacial', { cotaRacial });
+    }
+    if (pcd) {
+      qb.andWhere('inscricao.pcd = :pcd', { pcd });
+    }
+    if (cargoFuncao) {
+      qb.andWhere('inscricao.cargoFuncao = :cargoFuncao', { cargoFuncao });
+    }
+
+    // 🔄 Busca todos os dados filtrados
+    const todosDados = await qb.getMany();
+
+    // 🧠 Adiciona campos auxiliares
+    const dadosComExtras = todosDados.map((item) => {
+      const idade = this.calcularIdade(item.dataNascimento);
+      const pontosEducacao = calcularPontosEducacao(item, item.escolaridade);
+      return {
+        ...item,
+        idade,
+        pontosEducacao,
+      };
+    });
+
+    // 🏁 Ordena com os novos critérios de desempate
+    const ordenados = dadosComExtras.sort((a, b) => {
+      // ==================================================================
+      // NOVO: 1º Critério - Jogar desclassificados para o fim
+      // ==================================================================
+      const aIsDisqualified = a.status === 'Desclassificado';
+      const bIsDisqualified = b.status === 'Desclassificado';
+
+      if (aIsDisqualified !== bIsDisqualified) {
+        // Se 'a' for desclassificado, ele vai para depois de 'b' (retorna 1).
+        // Se 'b' for desclassificado, ele vai para depois de 'a' (retorna -1).
+        return aIsDisqualified ? 1 : -1;
+      }
+
+      // Critérios antigos continuam se não houver diferença no status
+      if (b.pontuacao !== a.pontuacao) return b.pontuacao - a.pontuacao;
+
+      const isAIdoso = a.idade >= 60;
+      const isBIdoso = b.idade >= 60;
+      if (isAIdoso !== isBIdoso) return isAIdoso ? -1 : 1;
+
+      if (b.pontosEducacao !== a.pontosEducacao) return b.pontosEducacao - a.pontosEducacao;
+      if (b.totalDeDias !== a.totalDeDias) return b.totalDeDias - a.totalDeDias;
+      
+      return b.idade - a.idade;
+    });
+
+    // 🎯 Atribui classificação
+    const dadosClassificados = ordenados.map((item, index) => ({
+      ...item,
+      classificacao: index + 1,
+    }));
+
+    // ==================================================================
+    // NOVO: Paginação condicional
+    // ==================================================================
+    let paginatedData = dadosClassificados;
+    let totalPages = 1;
+    let currentPage = 1;
+
+    // Só aplica paginação se NÃO estiver filtrando por um cargo/função específico
+    if (!cargoFuncao) {
+      paginatedData = dadosClassificados.slice(skip, skip + take);
+      totalPages = Math.ceil(dadosClassificados.length / take);
+      currentPage = page;
+    }
+
+    return {
+      data: paginatedData,
+      total: dadosClassificados.length,
+      page: currentPage,
+      pageCount: totalPages,
+    };
+  } catch (error) {
+    console.error('Erro ao buscar inscrições:', error);
+    throw new Error('Erro ao buscar inscrições.');
   }
+}
 
   private calcularIdade(dataNascimento: string): number {
     const nascimento = new Date(dataNascimento);
@@ -312,6 +332,31 @@ export class InscricaoEducacaoService {
     const buffer = await workbook.xlsx.writeBuffer();
     return Buffer.from(buffer);
   }
+
+  async addStatus(
+    id: number,
+    dto: AddAvaliableCandidateDto,
+  ): Promise<InscricaoEducacao> { // O tipo de retorno também deve ser InscricaoEducacao
+    // 1. Busca a inscrição pelo ID fornecido.
+    //    (Variável renomeada para 'inscricao' para maior clareza)
+    const inscricao = await this.inscricaoEducacaoRepository.findOne({
+      where: { id },
+    });
+
+    // 2. Se a inscrição não for encontrada, lança um erro 404.
+    if (!inscricao) {
+      throw new NotFoundException(`Inscrição com ID ${id} não encontrada.`);
+    }
+
+    // 3. Atribui os novos valores à inscrição.
+    inscricao.status = dto.status;
+    inscricao.obs = dto.obs;
+
+    // 4. Salva a INSCRIÇÃO com as informações atualizadas no banco de dados.
+    //    👇 CORREÇÃO PRINCIPAL: use o repositório correto.
+    return this.inscricaoEducacaoRepository.save(inscricao);
+  }
+
   private maskCpf(cpf: string): string {
     const digits = cpf.replace(/\D/g, '');
     if (digits.length !== 11) return cpf;

@@ -12,6 +12,7 @@ import { AuthGuard } from 'src/auth/auth.guard';
 import { CurrentUser } from 'src/decorators/currentUser.decorator';
 import { AuthGuardCandidates } from 'src/candidato-auth/auth.guard';
 import type { UpdateScoreDto } from './dto/update-score.dto';
+import type { AddAvaliableCandidateDto } from './dto/add-avaliable-candidte.dto';
 
 @Controller('inscricao-educacao')
 export class InscricaoEducacaoController {
@@ -46,6 +47,14 @@ export class InscricaoEducacaoController {
   findAll(@Query() query: QueryInscricaoEducacaoDto & { page?: number }) {
     return this.inscricaoEducacaoService.findAll(query);
   }
+  @Post(':id/status')
+  addCandidateStatus(
+    @Param('id') id: number,
+    @Body() addAvaliableCandidateDto: AddAvaliableCandidateDto,
+  ) {
+    return this.inscricaoEducacaoService.addStatus(id, addAvaliableCandidateDto);
+  }
+
 
   @UseGuards(AuthGuard)
   @Post('export')
@@ -63,10 +72,6 @@ export class InscricaoEducacaoController {
     @Param('id') id: string,
     @Res() res: Response
   ) {
-    // Sanitiza o CPF para garantir o padrão
-
-
-    // Procura o candidato pelo CPF
     const inscricao = await this.inscricaoEducacaoService.findOne(+id);
 
     const cpfSanitizado = inscricao.cpf.replace(/\D/g, '');
@@ -74,8 +79,6 @@ export class InscricaoEducacaoController {
     if (!inscricao) {
       return res.status(404).json({ message: 'Inscrição não encontrada' });
     }
-
-    // Sanitiza o nome e cria o nome da pasta
     const nomeSanitizado = inscricao.nomeCompleto.normalize("NFD")
       .replace(/[\u0300-\u036f]/g, "")
       .replace(/\s+/g, "_")
