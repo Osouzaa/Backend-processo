@@ -143,122 +143,121 @@ export class InscricaoEducacaoService {
     return this.inscricaoEducacaoRepository.findOne({ where: { cpf } });
   }
   async findAll(query: QueryInscricaoEducacaoDto & { page?: number }) {
-    try {
-      const {
-        cpf,
-        escolaridade,
-        cargoFuncao,
-        nomeCompleto,
-        cotaRacial,
-        pcd,
-        status,
-        page = 1,
-        limit,
-      } = query;
+  try {
+    const {
+      cpf,
+      escolaridade,
+      cargoFuncao,
+      nomeCompleto,
+      cotaRacial,
+      pcd,
+      status,
+      page = 1,
+      limit,
+    } = query;
 
-      const take = limit || 20;
-      const skip = (page - 1) * take;
+    const take = limit || 20;
+    const skip = (page - 1) * take;
 
-      const qb = this.inscricaoEducacaoRepository.createQueryBuilder('inscricao');
+    const qb = this.inscricaoEducacaoRepository.createQueryBuilder('inscricao');
 
-      // 🔍 Filtros de banco de dados
-      if (cpf) {
-        qb.andWhere(
-          "REPLACE(REPLACE(REPLACE(inscricao.cpf, '.', ''), '-', ''), ' ', '') = :cpf",
-          { cpf: cpf.replace(/\D/g, '') }
-        );
-      }
-      if (escolaridade) {
-        // Compara as duas strings (do banco e do parâmetro) sem acentos
-        qb.andWhere('unaccent(inscricao.escolaridade) ILIKE unaccent(:escolaridade)', { escolaridade });
-      }
-      if (cotaRacial) {
-        qb.andWhere('inscricao.cotaRacial = :cotaRacial', { cotaRacial });
-      }
-      if (pcd) {
-        if (pcd === 'Sim') {
-          qb.andWhere("inscricao.pcd IS NOT NULL AND inscricao.pcd NOT IN (:...pcdValues)", {
-            pcdValues: ['Não Possui', '']
-          });
-        } else {
-          qb.andWhere('inscricao.pcd = :pcd', { pcd });
-        }
-      }
-      if (cargoFuncao) {
-        qb.andWhere('inscricao.cargoFuncao = :cargoFuncao', { cargoFuncao });
-      }
-
-      // 🔄 Busca todos os dados filtrados
-      const todosDados = await qb.getMany();
-      let dadosFinais = todosDados;
-
-      if (cargoFuncao) {
-        const dadosComExtras = todosDados.map((item) => {
-          const idade = this.calcularIdade(item.dataNascimento);
-          const pontosEducacao = calcularPontosEducacao(item, item.escolaridade);
-          return { ...item, idade, pontosEducacao };
-        });
-
-        // ==================================================================
-        // MUDANÇA CRÍTICA: Lógica de ordenação mais robusta
-        // ==================================================================
-        const ordenados = dadosComExtras.sort((a, b) => {
-          // 1. Atribui um peso para cada status para definir a prioridade
-          const getStatusWeight = (status: string | null | undefined) => {
-            if (status === 'Aprovado') return 1;
-            if (status === 'Desclassificado') return 3;
-            return 2; // Pendente, nulo ou qualquer outro status fica no meio
-          };
-
-          const weightA = getStatusWeight(a.status);
-          const weightB = getStatusWeight(b.status);
-
-          // 2. Compara primeiro pelo peso do status
-          if (weightA !== weightB) {
-            return weightA - weightB; // Ordena por prioridade (1, 2, 3)
-          }
-
-          // 3. Se o status for o mesmo, aplica os critérios de desempate
-          if (b.pontuacao !== a.pontuacao) return b.pontuacao - a.pontuacao;
-
-          const isAIdoso = a.idade >= 60;
-          const isBIdoso = b.idade >= 60;
-          if (isAIdoso !== isBIdoso) return isAIdoso ? -1 : 1;
-
-          if (b.pontosEducacao !== a.pontosEducacao) return b.pontosEducacao - a.pontosEducacao;
-          if (b.totalDeDias !== a.totalDeDias) return b.totalDeDias - a.totalDeDias;
-
-          return b.idade - a.idade;
-        });
-
-        const dadosClassificados = ordenados.map((item, index) => ({
-          ...item,
-          classificacao: index + 1,
-        }));
-
-        dadosFinais = dadosClassificados;
-      }
-
-      if (status) {
-        // Este filtro agora será aplicado em uma lista perfeitamente ordenada
-        dadosFinais = dadosFinais.filter(item => item.status === status);
-      }
-
-      const totalItems = dadosFinais.length;
-      const paginatedData = dadosFinais.slice(skip, skip + take);
-      const totalPages = Math.ceil(totalItems / take);
-
-      return {
-        data: paginatedData,
-        total: totalItems,
-        page: page,
-        pageCount: totalPages,
-      };
-    } catch (error) {
-      console.error('Erro ao buscar inscrições:', error);
-      throw new Error('Erro ao buscar inscrições.');
+    // 🔍 Filtros de banco de dados
+    if (cpf) {
+      qb.andWhere(
+        "REPLACE(REPLACE(REPLACE(inscricao.cpf, '.', ''), '-', ''), ' ', '') = :cpf",
+        { cpf: cpf.replace(/\D/g, '') }
+      );
     }
+    if (escolaridade) {
+      qb.andWhere('inscricao.escolaridade = :escolaridade', { escolaridade });
+    }
+    if (cotaRacial) {
+      qb.andWhere('inscricao.cotaRacial = :cotaRacial', { cotaRacial });
+    }
+    if (pcd) {
+      if (pcd === 'Sim') {
+        qb.andWhere("inscricao.pcd IS NOT NULL AND inscricao.pcd NOT IN (:...pcdValues)", {
+          pcdValues: ['Não Possui', '']
+        });
+      } else {
+        qb.andWhere('inscricao.pcd = :pcd', { pcd });
+      }
+    }
+    if (cargoFuncao) {
+      qb.andWhere('inscricao.cargoFuncao = :cargoFuncao', { cargoFuncao });
+    }
+
+    // 🔄 Busca todos os dados filtrados
+    const todosDados = await qb.getMany();
+    let dadosFinais = todosDados;
+
+    if (cargoFuncao) {
+      const dadosComExtras = todosDados.map((item) => {
+        const idade = this.calcularIdade(item.dataNascimento);
+        const pontosEducacao = calcularPontosEducacao(item, item.escolaridade);
+        return { ...item, idade, pontosEducacao };
+      });
+
+      // ==================================================================
+      // MUDANÇA CRÍTICA: Lógica de ordenação mais robusta
+      // ==================================================================
+      const ordenados = dadosComExtras.sort((a, b) => {
+        // 1. Atribui um peso para cada status para definir a prioridade
+        const getStatusWeight = (status: string | null | undefined) => {
+          if (status === 'Aprovado') return 1;
+          if (status === 'Desclassificado') return 3;
+          return 2; // Pendente, nulo ou qualquer outro status fica no meio
+        };
+
+        const weightA = getStatusWeight(a.status);
+        const weightB = getStatusWeight(b.status);
+
+        // 2. Compara primeiro pelo peso do status
+        if (weightA !== weightB) {
+          return weightA - weightB; // Ordena por prioridade (1, 2, 3)
+        }
+
+        // 3. Se o status for o mesmo, aplica os critérios de desempate
+        if (b.pontuacao !== a.pontuacao) return b.pontuacao - a.pontuacao;
+        
+        const isAIdoso = a.idade >= 60;
+        const isBIdoso = b.idade >= 60;
+        if (isAIdoso !== isBIdoso) return isAIdoso ? -1 : 1;
+        
+        if (b.pontosEducacao !== a.pontosEducacao) return b.pontosEducacao - a.pontosEducacao;
+        if (b.totalDeDias !== a.totalDeDias) return b.totalDeDias - a.totalDeDias;
+        
+        return b.idade - a.idade;
+      });
+
+      const dadosClassificados = ordenados.map((item, index) => ({
+        ...item,
+        classificacao: index + 1,
+      }));
+
+      dadosFinais = dadosClassificados;
+    }
+
+    if (status) {
+      // Este filtro agora será aplicado em uma lista perfeitamente ordenada
+      dadosFinais = dadosFinais.filter(item => item.status === status);
+    }
+
+    const totalItems = dadosFinais.length;
+    const paginatedData = dadosFinais.slice(skip, skip + take);
+    const totalPages = Math.ceil(totalItems / take);
+
+    return {
+      data: paginatedData,
+      total: totalItems,
+      page: page,
+      pageCount: totalPages,
+    };
+  } catch (error) {
+    console.error('Erro ao buscar inscrições:', error);
+    throw new Error('Erro ao buscar inscrições.');
   }
+}
 
   private calcularIdade(dataNascimento: string): number {
     const nascimento = new Date(dataNascimento);
