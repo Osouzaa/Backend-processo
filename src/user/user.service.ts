@@ -24,6 +24,7 @@ export class UserService {
         throw new ConflictException('E-mail já está em uso');
       }
 
+      
       const newUser = this.userRepository.create(createUserDto);
       await this.userRepository.save(newUser);
       return newUser; // Retorna o usuário criado
