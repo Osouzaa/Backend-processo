@@ -15,7 +15,11 @@ export class UserService {
   // Criação de um usuário com verificação de e-mail existente
   async create(createUserDto: CreateUserDto) {
     try {
-      const existingUser = await this.findByEmail(createUserDto.email);
+      const existingUser = await this.userRepository.findOne({
+        where: {
+          email: createUserDto.email
+        }
+      });
       if (existingUser) {
         throw new ConflictException('E-mail já está em uso');
       }
